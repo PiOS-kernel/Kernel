@@ -5,7 +5,7 @@
 #include "task.h"
 
 // create an instance of a TaskTCB with priority p
-TaskTCB new_TaskTCB( uint8_t p )
+TaskTCB new_TaskTCB( int p )
 {
     TaskTCB new_task;
     new_task.priority = p;
@@ -16,36 +16,45 @@ TaskTCB new_TaskTCB( uint8_t p )
 }
 
 // utility method that computes the start address of the stack
-uint8_t *stack_start(struct TaskTCB *self)
+int* stack_start(TaskTCB *task)
 {
-    return &self->stack[0];
+    int* start = task->stack[0]; 
+    return start;
 }
 
 // utility method that computes the end address of the stack
-uint8_t *stack_end(struct TaskTCB *self)
+int* stack_end(TaskTCB *task)
 {
-    return &self->stack[STACK_SIZE];
+    int* end = &task->stack[STACK_SIZE]; 
+    return end;
+}
+
+void memcpy(int* src, int* dest, int size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        *(dest+i) = *(src+i);
+    }
 }
 
 // utility method to push values onto the task's stack
-void stack_push(struct TaskTCB *self, uint8_t *src, size_t size)
+void stack_push(TaskTCB * task, int* src, int size)
 {
     // Check whether there is room left on the stack
-    if ((uintptr_t)self->stp < (uintptr_t)&self->stack[0])
+    if ((int)task->stp - size < stack_start(task))
     {
-        exit(-1); // execution is halted
+        exit(-1);
     }
-
     // The data is stored onto the stack and the stack pointer
     // is decremented.
-    self->stp = self->stp - size;
-    memcpy(src, self->stp, size);
+    task->stp = task->stp - size;
+    memcpy(src, task->stp, size);
 }
 
 // initialize the queue with both head and tail NULL
-struct Queue *new_Queue()
+Queue* new_Queue()
 {
-    struct Queue *queue = malloc(sizeof(struct Queue));
+    Queue* queue;
     queue->head = NULL;
     queue->tail = NULL;
     return queue;

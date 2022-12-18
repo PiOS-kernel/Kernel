@@ -13,9 +13,9 @@ struct TaskTCB *RUNNING = NULL;
 // ... etc
 typedef struct TaskTCB
 {
-    uint8_t* stp;                   // stack pointer
-    uint8_t priority;               // priority of the task
-    uint8_t stack[STACK_SIZE];      // stack associated to the task
+    int* stp;                       // stack pointer
+    int priority;                   // priority of the task
+    int stack[STACK_SIZE];          // stack associated to the task
     struct TaskTCB* next;           // reference to the next Task_TCB
 }TaskTCB;
 
@@ -34,5 +34,6 @@ TaskTCB* dequeue (Queue* q);
 void enqueue (Queue* q, TaskTCB *task);
 int count_tasks( Queue* q);
 TaskTCB* schedule();
+void memcpy(int* src, int* stp, int size);
 
 #endif
