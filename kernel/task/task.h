@@ -1,6 +1,10 @@
 #ifndef TASK_H
 #define TASK_H
 
+#include <stdbool.h>
+#include <stdint.h>
+#include <stddef.h>
+
 // global variables
 #define STACK_SIZE 4096
 #define MIN_PRIORITY 10         //low values of prioriry represent the higher priority
@@ -17,7 +21,7 @@ typedef struct TaskTCB
     int priority;                   // priority of the task
     int stack[STACK_SIZE];          // stack associated to the task
     struct TaskTCB* next;           // reference to the next Task_TCB
-}TaskTCB;
+} TaskTCB;
 
 typedef struct Queue
 {
