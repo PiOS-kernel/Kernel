@@ -30,8 +30,8 @@ typedef struct Queue
 }Queue;
 
 //prioriy queues
-Queue* WAITING_QUEUES[MIN_PRIORITY];
-Queue* READY_QUEUES[MIN_PRIORITY];
+Queue WAITING_QUEUES[MIN_PRIORITY];
+Queue READY_QUEUES[MIN_PRIORITY];
 
 bool empty (Queue* q);
 TaskTCB* dequeue (Queue* q);
