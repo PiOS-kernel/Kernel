@@ -2,13 +2,13 @@
 #include "../utils/utils.h"
 
 // create an instance of a TaskTCB with priority p
-TaskTCB new_TaskTCB( int p )
+TaskTCB new_TaskTCB( uint8_t p )
 {
     TaskTCB new_task;
     new_task.priority = p;
     new_task.next = NULL;
-    // The stack pointer is initialized to the start address of the task's stak
-    new_task.stp = new_task.stack;
+    // The stack pointer is initialized to the end address of the task's stack
+    new_task.stp = (uint8_t*) (new_task.stack + STACK_SIZE);
     return new_task;
 }
 
@@ -115,9 +115,9 @@ TaskTCB* schedule()
     //look for the first element of the higer priority queue which is not empty
     for (int i=0; i<MIN_PRIORITY; i++)
     {
-        if (!empty(READY_QUEUES[i]))
+        if (!empty(&READY_QUEUES[i]))
         {
-            selected = dequeue(READY_QUEUES[i]);
+            selected = dequeue(&READY_QUEUES[i]);
             break;
         }
     }
