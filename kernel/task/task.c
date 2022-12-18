@@ -1,4 +1,5 @@
 #include "task.h"
+#include "../utils/utils.h"
 
 // create an instance of a TaskTCB with priority p
 TaskTCB new_TaskTCB( int p )
@@ -23,14 +24,6 @@ int* stack_end(TaskTCB *task)
 {
     int* end = &task->stack[STACK_SIZE]; 
     return end;
-}
-
-void memcpy(int* src, int* dest, int size)
-{
-    for (int i = 0; i < size; i++)
-    {
-        *(dest+i) = *(src+i);
-    }
 }
 
 // utility method to push values onto the task's stack

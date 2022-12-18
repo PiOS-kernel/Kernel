@@ -38,6 +38,5 @@ TaskTCB* dequeue (Queue* q);
 void enqueue (Queue* q, TaskTCB *task);
 int count_tasks( Queue* q);
 TaskTCB* schedule();
-void memcpy(int* src, int* stp, int size);
 
 #endif
