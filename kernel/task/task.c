@@ -15,7 +15,7 @@ TaskTCB new_TaskTCB( int p )
 // utility method that computes the start address of the stack
 int* stack_start(TaskTCB *task)
 {
-    int* start = task->stack[0]; 
+    int* start = task->stack; 
     return start;
 }
 

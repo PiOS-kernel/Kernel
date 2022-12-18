@@ -17,9 +17,9 @@ struct TaskTCB *RUNNING = NULL;
 // ... etc
 typedef struct TaskTCB
 {
-    int* stp;                       // stack pointer
-    int priority;                   // priority of the task
-    int stack[STACK_SIZE];          // stack associated to the task
+    uint8_t* stp;                       // stack pointer
+    uint8_t priority;                   // priority of the task
+    uint8_t stack[STACK_SIZE];          // stack associated to the task
     struct TaskTCB* next;           // reference to the next Task_TCB
 } TaskTCB;
 
