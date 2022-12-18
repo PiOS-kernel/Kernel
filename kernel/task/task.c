@@ -39,11 +39,11 @@ void stack_push(TaskTCB * task, uint8_t* src, int size)
 }
 
 // initialize the queue with both head and tail NULL
-Queue* new_Queue()
+Queue new_Queue()
 {
-    Queue* queue;
-    queue->head = NULL;
-    queue->tail = NULL;
+    Queue queue;
+    queue.head = NULL;
+    queue.tail = NULL;
     return queue;
 }
 

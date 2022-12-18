@@ -33,10 +33,14 @@ typedef struct Queue
 Queue WAITING_QUEUES[MIN_PRIORITY];
 Queue READY_QUEUES[MIN_PRIORITY];
 
+// Task Control Block function prototypes
 TaskTCB new_TaskTCB( uint8_t p );
 uint8_t* stack_start(TaskTCB *task);
 uint8_t* stack_end(TaskTCB *task);
 void stack_push(TaskTCB * task, uint8_t* src, int size);
+
+// Queue function prototypes
+Queue new_Queue();
 bool empty (Queue* q);
 TaskTCB* dequeue (Queue* q);
 void enqueue (Queue* q, TaskTCB *task);
