@@ -13,31 +13,29 @@ TaskTCB new_TaskTCB( uint8_t p )
 }
 
 // utility method that computes the start address of the stack
-int* stack_start(TaskTCB *task)
+uint8_t* stack_start(TaskTCB *task)
 {
     int* start = task->stack; 
-    return start;
+    return (uint8_t*) start;
 }
 
 // utility method that computes the end address of the stack
-int* stack_end(TaskTCB *task)
+uint8_t* stack_end(TaskTCB *task)
 {
-    int* end = &task->stack[STACK_SIZE]; 
+    uint8_t* end = (uint8_t*) task->stack + STACK_SIZE; 
     return end;
 }
 
 // utility method to push values onto the task's stack
-void stack_push(TaskTCB * task, int* src, int size)
+void stack_push(TaskTCB * task, uint8_t* src, int size)
 {
     // Check whether there is room left on the stack
     if ((int)task->stp - size < stack_start(task))
     {
-        exit(-1);
+        // The stack pointer is decremented and data is pushed onto the stack
+        task->stp = task->stp - size;
+        memcpy(src, task->stp, size);   
     }
-    // The data is stored onto the stack and the stack pointer
-    // is decremented.
-    task->stp = task->stp - size;
-    memcpy(src, task->stp, size);
 }
 
 // initialize the queue with both head and tail NULL
