@@ -1,4 +1,4 @@
-#include "systasks.h"
+#include "syscalls.h"
 
 /*
 This enum lists all the services that can be requested by an application to
@@ -17,7 +17,7 @@ It accepts a function pointer, a pointer to its arguments, and a priority.
 The function simply invokes the kernel to request the given service.
 */
 
-void create_task(fn_ptr code, void* args, uint32_t priority) {
+void create_task(void (*code)(void *), void* args, uint32_t priority) {
     asm volatile (
         "svc %[syscall_id]\n\t"
         "mov pc, lr\n"
