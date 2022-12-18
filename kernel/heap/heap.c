@@ -8,7 +8,7 @@ const Heap new_heap() {
 
 /* Initializes the heap as a single empty memory block */
 
-void heap_init(Heap *heap, char* start_address, size_t size) {
+void heap_init(Heap *heap, uint8_t* start_address, size_t size) {
     add_free_segment(heap, start_address, size);
 }
 
@@ -17,7 +17,7 @@ Allocates to a memory segment of the given size, and returns a pointer to it
 to the caller.
 */
 
-char* allocate_segment(Heap *heap, size_t size) {
+uint8_t* allocate_segment(Heap *heap, size_t size) {
     // There is no available memory left
     if (heap->head == NULL) {
         return NULL;
@@ -34,7 +34,7 @@ char* allocate_segment(Heap *heap, size_t size) {
         // allocated
         heap_trim_segment(old_head, actual_size);
         heap->head = old_head->next;
-        return (char*) old_head;
+        return (uint8_t*) old_head;
     }
     
     // Iterates through the list until a fitting free segment is found
@@ -59,7 +59,7 @@ char* allocate_segment(Heap *heap, size_t size) {
         previous->next = current->next;
     } else heap->head = current->next;
     
-    return (char*) current;
+    return (uint8_t*) current;
 }
 
 /* 
@@ -67,7 +67,7 @@ When a segment is freed, it is put back into the list of
 free segments
 */
 
-void free_segment(Heap *heap, char* start_address, size_t size) {
+void free_segment(Heap *heap, uint8_t* start_address, size_t size) {
     add_free_segment(heap, start_address, size);
 
     // Ajacent segments are merged
@@ -81,12 +81,12 @@ memory address where segment A lives comes after the memory address where segmen
 B lives. This allows to efficiently merge together adjecent segments
 */
 
-void add_free_segment(Heap* heap, char* address, size_t size) {
+void add_free_segment(Heap* heap, uint8_t* address, size_t size) {
     // The header is written in memory
     MemorySegment* new_seg = init_segment(address, size);
 
     // The segment might be inserted on top of the list
-    if (heap->head == NULL || (char*) heap->head > address) {
+    if (heap->head == NULL || (uint8_t*) heap->head > address) {
         new_seg->next = heap->head;
         heap->head = new_seg;
         return;
@@ -95,7 +95,7 @@ void add_free_segment(Heap* heap, char* address, size_t size) {
     // Iterate through the list until a segment starting at a greater address 
     // than the new one is found
     MemorySegment* cursor = heap->head;
-    while (cursor->next != NULL && (char*) cursor->next < address)
+    while (cursor->next != NULL && (uint8_t*) cursor->next < address)
         cursor = cursor->next;
 
     // The segment is inserted into the list
@@ -118,7 +118,7 @@ void compaction(Heap* self) {
     // Adjecent segments are pairs of segments where the end address of the first
     // one is equal to the start address of the second one. 
     // As long as adjecent segments are found, they are merged into a single one.
-    while (cursor->next != NULL && segment_end_address(cursor) == (char*) cursor->next) {
+    while (cursor->next != NULL && segment_end_address(cursor) == (uint8_t*) cursor->next) {
         cursor->size = cursor->size + cursor->next->size;
         cursor->next = cursor->next->next;
         cursor = cursor->next;
@@ -150,7 +150,7 @@ The function is given a memory address where it should initialize a
 `MemorySegment` struct. It returns a pointer to it
 */
 
-MemorySegment* init_segment(char* start_address, size_t size) {
+MemorySegment* init_segment(uint8_t* start_address, size_t size) {
     MemorySegment* seg_ptr = (MemorySegment*) start_address;
     seg_ptr->size = size;
     seg_ptr->next = NULL;
@@ -159,8 +159,8 @@ MemorySegment* init_segment(char* start_address, size_t size) {
 
 /* Utility function that computes the memory address where the given segment ends */
 
-char* segment_end_address(MemorySegment* seg) {
-    return ((char*) seg) + seg->size;
+uint8_t* segment_end_address(MemorySegment* seg) {
+    return ((uint8_t*) seg) + seg->size;
 }
 
 /*
@@ -169,7 +169,7 @@ The function trims down a segment splitting it into two new ones of sizes
 */
 
 void trim_segment(MemorySegment* seg, size_t target_size) {
-    char* new_seg_addr = ((char*) seg) + target_size;
+    uint8_t* new_seg_addr = ((uint8_t*) seg) + target_size;
     size_t new_seg_size = seg->size - target_size;
 
     if (new_seg_size > SEGMENT_HEADER_SIZE) {
