@@ -1,6 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-void memcpy(int* src, int* stp, int size);
+#include <stdint.h>
+
+void memcpy(uint8_t* src, uint8_t* stp, int size);
 
 #endif
