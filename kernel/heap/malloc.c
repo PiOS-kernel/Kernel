@@ -8,4 +8,4 @@ char* malloc(size_t size) {
 
 /* The great free, as a macro */
 
-#define free(ptr) if (ptr != NULL) {add_free_segment(ptr, sizeof(*ptr));}
+#define free(ptr) if (ptr != NULL) {add_free_segment(&HEAP, (char*) ptr, sizeof(*ptr));}
