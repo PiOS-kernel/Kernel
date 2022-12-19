@@ -1,152 +1,89 @@
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "task.h"
+#include "../utils/utils.h"
 
-#define STACK_SIZE 4096
-#define MAX_PRIORITY 10
-
-typedef struct TaskTCB *TcbBlock;
-
-// Definition of the Task Control Block.
-// The struct's fields are stored in the order they appear in the definition:
-// - bytes [0 - 3]: stp
-// - bytes [4 - 7]: priority
-// ... etc
-struct TaskTCB
+// create an instance of a TaskTCB with priority p
+TaskTCB new_TaskTCB( uint8_t p )
 {
-    uint8_t *stp;              // stack pointer
-    uint8_t priority;          // priority of the task
-    uint8_t stack[STACK_SIZE]; // stack associated to the task
-    TcbBlock next;             // reference to the next Task_TCB
-};
-
-// global variables
-struct TaskTCB *RUNNING = NULL;
-
-// constructor for a TaskTCB that return an instance of a TaskTCB
-// with the associating the parameters to the corresponding fields
-struct TaskTCB *new_TaskTCB(TcbBlock n, uint8_t p)
-{
-    struct TaskTCB *tcb = malloc(sizeof(struct TaskTCB));
-    tcb->next = n;
-    tcb->priority = p;
-    tcb->stp = NULL;
-    memset(tcb->stack, 0, STACK_SIZE);
-
-    // The stack pointer is initialized to the start address of the task's
-    // stack
-    tcb->stp = &tcb->stack[STACK_SIZE];
-    return tcb;
+    TaskTCB new_task;
+    new_task.priority = p;
+    new_task.next = NULL;
+    // The stack pointer is initialized to the end address of the task's stack
+    new_task.stp = (uint8_t*) (new_task.stack + STACK_SIZE);
+    return new_task;
 }
 
 // utility method that computes the start address of the stack
-uint8_t *stack_start(struct TaskTCB *self)
+uint8_t* stack_start(TaskTCB *task)
 {
-    return &self->stack[0];
+    int* start = task->stack; 
+    return (uint8_t*) start;
 }
 
 // utility method that computes the end address of the stack
-uint8_t *stack_end(struct TaskTCB *self)
+uint8_t* stack_end(TaskTCB *task)
 {
-    return &self->stack[STACK_SIZE];
+    uint8_t* end = (uint8_t*) task->stack + STACK_SIZE; 
+    return end;
 }
 
 // utility method to push values onto the task's stack
-void stack_push(struct TaskTCB *self, uint8_t *src, size_t size)
+void stack_push(TaskTCB * task, uint8_t* src, int size)
 {
     // Check whether there is room left on the stack
-    if ((uintptr_t)self->stp < (uintptr_t)&self->stack[0])
+    if ((int)task->stp - size < stack_start(task))
     {
-        exit(-1); // execution is halted
+        // The stack pointer is decremented and data is pushed onto the stack
+        task->stp = task->stp - size;
+        memcpy(src, task->stp, size);   
     }
-
-    // The data is stored onto the stack and the stack pointer
-    // is decremented.
-    self->stp = self->stp - size;
-    memcpy(src, self->stp, size);
 }
 
-typedef struct TaskTCB *TcbBlock;
-
-struct TaskTCB
-{
-    uint8_t *stp;              // stack pointer
-    uint8_t priority;          // priority of the task
-    uint8_t stack[STACK_SIZE]; // stack associated to the task
-    TcbBlock next;             // reference to the next Task_TCB
-};
-
-// This type implements the Iterator trait, which allows to iterate through
-// a Queue through the for task in queue construct
-struct QueueIterator
-{
-    TcbBlock next;
-};
-
-struct Queue
-{
-    TcbBlock head;
-    struct TaskTCB *tail;
-};
-
 // initialize the queue with both head and tail NULL
-struct Queue *new_Queue()
+Queue new_Queue()
 {
-    struct Queue *queue = malloc(sizeof(struct Queue));
-    queue->head = NULL;
-    queue->tail = NULL;
+    Queue queue;
+    queue.head = NULL;
+    queue.tail = NULL;
     return queue;
 }
 
 // return true if the queue is empty
-bool empty(struct Queue *self)
+bool empty( Queue* q)
 {
-    return self->head == NULL;
-}
-
-// returns an iterator
-struct QueueIterator *iter(struct Queue *self)
-{
-    struct QueueIterator *iterator = malloc(sizeof(struct QueueIterator));
-    iterator->next = self->head;
-    return iterator;
+    return q->head == NULL;
 }
 
 // enqueue a TaskTCB at the end of the queue
-void enqueue(struct Queue *self, struct TaskTCB *block)
+void enqueue (Queue* q, TaskTCB *task)
 {
-    struct TaskTCB *tail_ptr = block; // create raw pointer to the new element just created
-
-    if (empty(self))
+    if (empty(q))
     {
         // if the queue is empty add the element in the head
-        self->head = block;
+        q->head = task;
+        q->tail = task;
     }
     else
     {
-        // if it is not empty add the elemente in the tail.next
-        self->tail->next = block;
+        // if it is not empty enqueue the element as the last elemnt
+        q->tail->next = task;
+        q->tail = q->tail->next; // update the tail to the new end of the queue
     }
-    self->tail = tail_ptr; // update the tail to the new end of the queue
 }
 
 // dequque the first element of the queue
-struct TaskTCB *dequeue(struct Queue *self)
-{
-    if (self->head != NULL)
+TaskTCB* dequeue (Queue* q){
+    if (!empty(q))
     {
-        struct TaskTCB *old_head = self->head;
+        TaskTCB *old_head = q->head;
         if (old_head->next != NULL)
         {
-            // shift the head to the current head.next and update the tail if
-            self->head = old_head->next; // it is the last element
+            // shift the head to the following element in the queue 
+            q->head = old_head->next; 
         }
         else
         {
-            self->head = NULL;
-            self->tail = NULL;
+            q->head = NULL;
+            q->tail = NULL;
         }
         return old_head; // return the popped element
     }
@@ -157,47 +94,30 @@ struct TaskTCB *dequeue(struct Queue *self)
 }
 
 // returns the number of tasks currently in the queue
-size_t count_tasks(struct Queue *self)
+int count_tasks( Queue* q)
 {
-    size_t count = 0;
-    struct QueueIterator *iterator = iter(self);
-    while (iterator->next != NULL)
+    int count = 0;
+    TaskTCB *counter = q->head;
+    while (counter->next != NULL)
     {
-        count += 1;
-        iterator->next = iterator->next->next;
+        count++;
+        counter = counter->next;
     }
-    free(iterator);
     return count;
 }
 
-
-Queue WAITING_QUEUE;
-atomic_int RUNNING;
-
-TaskTCB* schedule() {
-    if (!WAITING_QUEUE.empty()) {
-        TaskTCB* tcb = WAITING_QUEUE.dequeue().unwrap();
-        RUNNING = (int) tcb;
-        return tcb;
-    } else {
-        if (RUNNING) {
-            return (TaskTCB*) RUNNING;
-        } else {
-            return NULL;
+//return the higer priority task ready to be executed 
+TaskTCB* schedule() 
+{
+    TaskTCB *selected;
+    //look for the first element of the higer priority queue which is not empty
+    for (int i=0; i<MIN_PRIORITY; i++)
+    {
+        if (!empty(&READY_QUEUES[i]))
+        {
+            selected = dequeue(&READY_QUEUES[i]);
+            break;
         }
     }
-}
-
-typedef struct QueueIterator {
-    TaskTCB* next;
-} QueueIterator;
-
-TaskTCB* next(QueueIterator* iter) {
-    if (iter->next) {
-        TaskTCB* node = iter->next;
-        iter->next = iter->next->next;
-        return node;
-    } else {
-        return NULL;
-    }
+    return NULL; //return NULL if all of the ready queues are empty 
 }
