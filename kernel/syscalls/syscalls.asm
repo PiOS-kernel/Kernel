@@ -1,11 +1,11 @@
-; This function does the context switch for a task.
-; It stores the current values in the registers to the current task's stack,
-; calls the schedule function, and loads the new task's stack in the registers.
-
     .thumb
 	.ref RUNNING
 
 ; -----------------------------------------------------------
+
+; This function does the context switch for a task.
+; It stores the current values in the registers to the current task's stack,
+; calls the schedule function, and loads the new task's stack in the registers.
 
 task_switch: .asmfunc
     ; Interrupts are disabled
