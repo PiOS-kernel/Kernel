@@ -107,7 +107,7 @@ void add_free_segment(Heap* heap, uint8_t* address, size_t size) {
 The function looks for adjecent segments and merges them into a single one
 */
 
-void compaction(Heap* self) {
+void heap_compaction(Heap* self) {
     // There is no available memory in the heap
     if (self->head == NULL) {
         return;
