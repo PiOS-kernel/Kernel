@@ -32,7 +32,7 @@ uint8_t* allocate_segment(Heap *heap, size_t size) {
 
         // The segment is split into two new ones, and the firt one is 
         // allocated
-        heap_trim_segment(old_head, actual_size);
+        trim_segment(old_head, actual_size);
         heap->head = old_head->next;
         return (uint8_t*) old_head;
     }
@@ -52,7 +52,7 @@ uint8_t* allocate_segment(Heap *heap, size_t size) {
     // The segment is split into two new ones. One of the required size, which
     // is allocated, and the other of the remaining size, which is inserted again
     // in the linked list;
-    heap_trim_segment(current, actual_size);
+    trim_segment(current, actual_size);
     
     // The allocated segment is removed from the linked list
     if (previous != NULL) {

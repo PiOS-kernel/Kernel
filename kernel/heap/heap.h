@@ -36,7 +36,7 @@ void heap_init(Heap *heap, uint8_t* start_address, size_t size);
 uint8_t* allocate_segment(Heap *heap, size_t size);
 void free_segment(Heap *heap, uint8_t* start_address, size_t size);
 void add_free_segment(Heap* heap, uint8_t* address, size_t size);
-void compaction(Heap* self);
+void heap_compaction(Heap* heap);
 size_t available_space(Heap* heap);
 size_t count_segments(Heap* heap);
 MemorySegment* init_segment(uint8_t* start_address, size_t size);
