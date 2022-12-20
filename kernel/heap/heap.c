@@ -118,10 +118,13 @@ void heap_compaction(Heap* self) {
     // Adjecent segments are pairs of segments where the end address of the first
     // one is equal to the start address of the second one. 
     // As long as adjecent segments are found, they are merged into a single one.
-    while (cursor->next != NULL && segment_end_address(cursor) == (uint8_t*) cursor->next) {
-        cursor->size = cursor->size + cursor->next->size;
-        cursor->next = cursor->next->next;
-        cursor = cursor->next;
+    while (cursor->next != NULL) {
+        if (segment_end_address(cursor) == (uint8_t*) cursor->next) {
+            cursor->size = cursor->size + cursor->next->size;
+            cursor->next = cursor->next->next;
+        } else {
+            cursor = cursor->next;
+        }
     }
 }
 
