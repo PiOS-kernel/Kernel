@@ -3,5 +3,8 @@
 
 #include "syscalls/syscalls.h"
 #include "heap/malloc.h"
+#include "task/task.h"
+
+void kernel_init();
 
 #endif
