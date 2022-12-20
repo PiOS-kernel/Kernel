@@ -15,8 +15,7 @@ TaskTCB new_TaskTCB( uint8_t p )
 // utility method that computes the start address of the stack
 uint8_t* stack_start(TaskTCB *task)
 {
-    int* start = task->stack; 
-    return (uint8_t*) start;
+    return (uint8_t*) task->stack;
 }
 
 // utility method that computes the end address of the stack
@@ -30,7 +29,7 @@ uint8_t* stack_end(TaskTCB *task)
 void stack_push(TaskTCB * task, uint8_t* src, int size)
 {
     // Check whether there is room left on the stack
-    if ((int)task->stp - size < stack_start(task))
+    if (task->stp - size < stack_start(task))
     {
         // The stack pointer is decremented and data is pushed onto the stack
         task->stp = task->stp - size;
@@ -109,7 +108,7 @@ int count_tasks( Queue* q)
 //return the higer priority task ready to be executed 
 TaskTCB* schedule() 
 {
-    TaskTCB *selected;
+    TaskTCB *selected = NULL;
     //look for the first element of the higer priority queue which is not empty
     for (int i=0; i<MIN_PRIORITY; i++)
     {
@@ -119,5 +118,7 @@ TaskTCB* schedule()
             break;
         }
     }
-    return NULL; //return NULL if all of the ready queues are empty 
+
+    RUNNING = selected; // set the selected task as the running task
+    return selected;
 }

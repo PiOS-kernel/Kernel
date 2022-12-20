@@ -1,4 +1,8 @@
 #include "syscalls.h"
+#include "../task/task.h"
+#include "stddef.h"
+#include "stdint.h"
+#include "../heap/malloc.h"
 
 /*
 This enum lists all the services that can be requested by an application to
@@ -17,7 +21,7 @@ It accepts a function pointer, a pointer to its arguments, and a priority.
 The function simply invokes the kernel to request the given service.
 */
 
-void create_task(void (*code)(void *), void* args, uint32_t priority) {
+void create_task(void (*code)(void *), void* args, uint8_t priority) {
     asm volatile (
         "svc %[syscall_id]\n\t"
         "mov pc, lr\n"
@@ -63,13 +67,13 @@ which should hold the memory address of the first instruction to be
 executed by the task.
 */
 
-void kcreate_task(void (*code)(void *), void *args, size_t priority) {
+void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
     // The task's TCB is created
-    TaskTCB tcb = TaskTCB_new(NULL, priority);
+    TaskTCB tcb = new_TaskTCB(priority);
 
     // The link register is pushed onto the stack, and initialized to be
     // the memory address of the first instruction executed by the task
-    TaskTCB_stack_push(&tcb, &code, sizeof(void *));
+    stack_push(&tcb, (uint8_t*) &code, sizeof(void *));
 
     // Registers r1 through r12 are pushed onto the stack and
     // 0-initialized.
@@ -77,19 +81,19 @@ void kcreate_task(void (*code)(void *), void *args, size_t priority) {
     // one register.
     size_t zeros[12] = {0};
     // The memory address of the first item in the array is given as source
-    TaskTCB_stack_push(&tcb, &zeros[0], sizeof(size_t) * 12);
+    stack_push(&tcb, (uint8_t*) &zeros[0], sizeof(size_t) * 12);
 
     // The pointer to the arguments is saved in register r0.
     // The ARM ABI specifies that the first 4 32-bit function arguments
     // should be put in registers r0-r3.
-    TaskTCB_stack_push(&tcb, &args, sizeof(void *));
+    stack_push(&tcb, (uint8_t*) &args, sizeof(void *));
 
-    TaskTCB *heap_allocated_tcb = malloc(sizeof(TaskTCB));
+    TaskTCB *heap_allocated_tcb = (TaskTCB*) malloc(sizeof(TaskTCB));
     *heap_allocated_tcb = tcb;
-    heap_allocated_tcb->stp = heap_allocated_tcb->stack_end() - 14 * 4;
+    heap_allocated_tcb->stp = stack_end(heap_allocated_tcb) - 14 * 4;
 
     // The task is inserted into the tasks queue
-    WAITING_QUEUE_enqueue(heap_allocated_tcb);
+    enqueue(&WAITING_QUEUES[priority], heap_allocated_tcb);
 }
 
 void unknownService(void) {
