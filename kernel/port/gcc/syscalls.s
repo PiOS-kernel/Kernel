@@ -1,7 +1,6 @@
     .cpu cortex-m4
     .thumb
     .syntax unified
-	.ref RUNNING
 
 @ -----------------------------------------------------------
 
