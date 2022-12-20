@@ -28,7 +28,7 @@ typedef struct Heap {
 } Heap;
 
 /* The global heap */
-static Heap HEAP;
+extern Heap HEAP;
 
 
 const Heap new_heap();

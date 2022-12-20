@@ -8,7 +8,7 @@
 // global variables
 #define STACK_SIZE 4096
 #define MIN_PRIORITY 10         //low values of prioriry represent the higher priority
-struct TaskTCB *RUNNING = NULL;
+extern struct TaskTCB *RUNNING;
 
 // Definition of the Task Control Block.
 // The struct's fields are stored in the order they appear in the definition:
@@ -25,22 +25,22 @@ typedef struct TaskTCB
 
 typedef struct Queue
 {
-    struct TaskTCB* head;
-    struct TaskTCB* tail;
+    TaskTCB* head;
+    TaskTCB* tail;
 }Queue;
 
 //prioriy queues
-Queue WAITING_QUEUES[MIN_PRIORITY];
-Queue READY_QUEUES[MIN_PRIORITY];
+extern Queue WAITING_QUEUES[MIN_PRIORITY];
+extern Queue READY_QUEUES[MIN_PRIORITY];
 
 // Task Control Block function prototypes
-TaskTCB new_TaskTCB( uint8_t p );
+void TaskTCB_init(TaskTCB* tcb, uint8_t p);
 uint8_t* stack_start(TaskTCB *task);
 uint8_t* stack_end(TaskTCB *task);
 void stack_push(TaskTCB * task, uint8_t* src, int size);
 
 // Queue function prototypes
-Queue new_Queue();
+void Queue_init(Queue* q);
 bool empty (Queue* q);
 TaskTCB* dequeue (Queue* q);
 void enqueue (Queue* q, TaskTCB *task);
