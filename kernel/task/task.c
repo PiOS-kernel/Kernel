@@ -1,15 +1,14 @@
 #include "task.h"
 #include "../utils/utils.h"
+#include <stddef.h>
 
 // create an instance of a TaskTCB with priority p
-TaskTCB new_TaskTCB( uint8_t p )
+void TaskTCB_init(TaskTCB* tcb, uint8_t p)
 {
-    TaskTCB new_task;
-    new_task.priority = p;
-    new_task.next = NULL;
+    tcb->priority = p;
+    tcb->next = NULL;
     // The stack pointer is initialized to the end address of the task's stack
-    new_task.stp = (uint8_t*) (new_task.stack + STACK_SIZE);
-    return new_task;
+    tcb->stp = (uint8_t*) (tcb->stack + STACK_SIZE);
 }
 
 // utility method that computes the start address of the stack
@@ -29,7 +28,7 @@ uint8_t* stack_end(TaskTCB *task)
 void stack_push(TaskTCB * task, uint8_t* src, int size)
 {
     // Check whether there is room left on the stack
-    if (task->stp - size < stack_start(task))
+    if (task->stp - size > stack_start(task))
     {
         // The stack pointer is decremented and data is pushed onto the stack
         task->stp = task->stp - size;
@@ -38,12 +37,10 @@ void stack_push(TaskTCB * task, uint8_t* src, int size)
 }
 
 // initialize the queue with both head and tail NULL
-Queue new_Queue()
+void Queue_init(Queue* q)
 {
-    Queue queue;
-    queue.head = NULL;
-    queue.tail = NULL;
-    return queue;
+    q->head = NULL;
+    q->tail = NULL;
 }
 
 // return true if the queue is empty
@@ -97,7 +94,7 @@ int count_tasks( Queue* q)
 {
     int count = 0;
     TaskTCB *counter = q->head;
-    while (counter->next != NULL)
+    while (counter != NULL)
     {
         count++;
         counter = counter->next;

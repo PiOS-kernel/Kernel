@@ -3,6 +3,7 @@
 #include "stddef.h"
 #include "stdint.h"
 #include "../heap/malloc.h"
+#include "../utils/utils.h"
 
 /*
 This enum lists all the services that can be requested by an application to
@@ -69,7 +70,8 @@ executed by the task.
 
 void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
     // The task's TCB is created
-    TaskTCB tcb = new_TaskTCB(priority);
+    TaskTCB tcb;
+    TaskTCB_init(&tcb, priority);
 
     // The link register is pushed onto the stack, and initialized to be
     // the memory address of the first instruction executed by the task
@@ -79,7 +81,8 @@ void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
     // 0-initialized.
     // 12 * 4 bytes are copied to the stack, where 4 bytes is the size of
     // one register.
-    size_t zeros[12] = {0};
+    size_t zeros[12];
+    memset((uint8_t*) zeros, 0, sizeof(size_t) * 12);
     // The memory address of the first item in the array is given as source
     stack_push(&tcb, (uint8_t*) &zeros[0], sizeof(size_t) * 12);
 
