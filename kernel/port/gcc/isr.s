@@ -8,7 +8,7 @@
 .global SVCallISR
 SVCallISR:
     @ Get the SVC number
-    ldr r4, [r7, #40]
+    ldr r4, [sp, #24]
     ldrb r4, [r4, #-2] @ -2 
 
     @ Dispatch to the requested service
