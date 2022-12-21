@@ -19,6 +19,7 @@ typedef struct TaskTCB
 {
     uint8_t* stp;                       // stack pointer
     uint8_t priority;                   // priority of the task
+    uint8_t _word_alignment_filling[3]; // padding to align the next field on a 4-byte boundary
     uint8_t stack[STACK_SIZE];          // stack associated to the task
     struct TaskTCB* next;           // reference to the next Task_TCB
 } TaskTCB;
