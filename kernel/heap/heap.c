@@ -132,7 +132,8 @@ void heap_compaction(Heap* self) {
 
 size_t available_space(Heap* heap) {
     size_t total = 0;
-    for (MemorySegment* seg = heap->head; seg != NULL; seg = seg->next) {
+    MemorySegment* seg;
+    for (seg = heap->head; seg != NULL; seg = seg->next) {
         total += seg->size;
     }
     return total;
@@ -142,7 +143,8 @@ size_t available_space(Heap* heap) {
 
 size_t count_segments(Heap* heap) {
     size_t total = 0;
-    for (MemorySegment* seg = heap->head; seg != NULL; seg = seg->next) {
+    MemorySegment* seg;
+    for (seg = heap->head; seg != NULL; seg = seg->next) {
         total += 1;
     }
     return total;
