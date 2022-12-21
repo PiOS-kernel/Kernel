@@ -1,14 +1,19 @@
+	.thumb
+	.global task_switch
+	.ref RUNNING
+	.ref schedule
+
+tmpRUNNING:	.word RUNNING
+tmpSchedule:	.word schedule
 ; This function does the context switch for a task.
 ; It stores the current values in the registers to the current task's stack,
 ; calls the schedule function, and loads the new task's stack in the registers.
-	.thumb_func
-	.global task_switch
-task_switch:
+task_switch: .asmfunc
     ; Interrupts are disabled
     cpsid i
 
     ; r0 is loaded with the pointer to the running task
-    ldr r0, =RUNNING
+    ldr r0, tmpRUNNING
 
     ; SAVE:
     ; Because the first 32 bits of the TaskTCB struct are dedicated to the stack
@@ -18,7 +23,7 @@ task_switch:
     ; If there is currently no running task, skip the SAVE part and
     ; branch to the scheduler
     cmp r0, #0
-    beq _scheduling_section
+    beq scheduling_section
 
     ; IF WE WHERE USING 'MSP' AND 'PSP', HERE WE WOULD NEED TO LOAD THE
     ; TASK'S STACK POINTER INTO 'R13' BEFORE SAVING THE REGISTERS
@@ -29,7 +34,8 @@ task_switch:
 
     ; SCHEDULING:
     ; the scheduling algorithm determines wich task should be executed
-    _scheduling_section: STMDB r13!, {r14}
+scheduling_section:
+	STMDB r13!, {r14}
     bl schedule
     ldmia r13!, {r14}
 
@@ -53,3 +59,5 @@ task_switch:
     ldmia r13!, {r0}
     ; At the top of the stack there is the return address to the task code
     mov pc, lr
+
+    .endasmfunc
