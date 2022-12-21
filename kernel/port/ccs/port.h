@@ -75,7 +75,7 @@ typedef struct SysTick {
  *          set 31st and 30th bit to ZERO (CLEAN),
  *          set [23th-0th] bits to ONE (SET) -> VALUE IS NOT CORRECT, NEED TO INCREASE OVERALL CLOCK
  */
-void SysTick_init();
+void SysTick_init(int val);
 void SysTick_enable();
 void SysTick_disable();
 

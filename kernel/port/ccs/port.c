@@ -2,7 +2,7 @@
 
 static SysTick* SYSTICK = (SysTick*)BASE;
 
-void SysTick_init(){
+void SysTick_init(int val){
     SYSTICK->CTRL = 0x00000004;
     SYSTICK->RELOAD = 0x00000000;
     SYSTICK->CURRENT = 0x00000000;
@@ -11,6 +11,8 @@ void SysTick_init(){
     // set [23th-0th] bits to ONE (SET) -> VALUE IS NOT CORRECT, NEED TO INCREASE OVERALL CLOCK
     SYSTICK->CALIB &= ~(0xC0000000);
     SYSTICK->CALIB |= MASK24;
+
+    SysTick_setLOAD(val);
 }
 
 void SysTick_enable(){
