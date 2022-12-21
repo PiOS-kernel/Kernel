@@ -70,12 +70,12 @@ executed by the task.
 
 void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
     // The task's TCB is created
-    TaskTCB tcb;
-    TaskTCB_init(&tcb, priority);
+    TaskTCB* tcb = (TaskTCB*) malloc(sizeof(TaskTCB));
+    TaskTCB_init(tcb, priority);
 
     // The link register is pushed onto the stack, and initialized to be
     // the memory address of the first instruction executed by the task
-    stack_push(&tcb, (uint8_t*) &code, sizeof(void *));
+    stack_push(tcb, (uint8_t*) &code, sizeof(void *));
 
     // Registers r1 through r12 are pushed onto the stack and
     // 0-initialized.
@@ -84,19 +84,16 @@ void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
     size_t zeros[12];
     memset((uint8_t*) zeros, 0, sizeof(size_t) * 12);
     // The memory address of the first item in the array is given as source
-    stack_push(&tcb, (uint8_t*) &zeros[0], sizeof(size_t) * 12);
+    stack_push(tcb, (uint8_t*) &zeros[0], sizeof(size_t) * 12);
 
     // The pointer to the arguments is saved in register r0.
     // The ARM ABI specifies that the first 4 32-bit function arguments
     // should be put in registers r0-r3.
-    stack_push(&tcb, (uint8_t*) &args, sizeof(void *));
+    stack_push(tcb, (uint8_t*) &args, sizeof(void *));
 
-    TaskTCB *heap_allocated_tcb = (TaskTCB*) malloc(sizeof(TaskTCB));
-    *heap_allocated_tcb = tcb;
-    heap_allocated_tcb->stp = stack_end(heap_allocated_tcb) - 14 * 4;
-
+    tcb->stp = stack_end(tcb) - 14 * 4;
     // The task is inserted into the tasks queue
-    enqueue(&WAITING_QUEUES[priority], heap_allocated_tcb);
+    enqueue(&WAITING_QUEUES[priority], tcb);
 }
 
 void unknownService(void) {
