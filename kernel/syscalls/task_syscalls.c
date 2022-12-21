@@ -22,15 +22,7 @@ It accepts a function pointer, a pointer to its arguments, and a priority.
 The function simply invokes the kernel to request the given service.
 */
 
-void create_task(void (*code)(void *), void* args, uint8_t priority) {
-    asm volatile (
-        "svc %[syscall_id]\n\t"
-        "mov pc, lr\n"
-        :
-        : [syscall_id] "I" (CREATE_TASK_ID)
-        :
-    );
-}
+extern void create_task(void (*code)(void *), void* args, uint8_t priority);
 
 /*
 

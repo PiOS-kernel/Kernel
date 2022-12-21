@@ -1,5 +1,5 @@
-#ifndef __SYSTICK_H__
-#define __SYSTICK_H__
+#ifndef __PORT_H__
+#define __PORT_H__
 
 #include <stdint.h>
 #include <stddef.h>
