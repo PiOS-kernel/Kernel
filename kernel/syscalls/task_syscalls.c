@@ -93,7 +93,7 @@ void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
 
     tcb->stp = stack_end(tcb) - 14 * 4;
     // The task is inserted into the tasks queue
-    enqueue(&WAITING_QUEUES[priority], tcb);
+    enqueue(&READY_QUEUES[priority], tcb);
 }
 
 void unknownService(void) {
