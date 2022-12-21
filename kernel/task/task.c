@@ -107,7 +107,8 @@ TaskTCB* schedule()
 {
     TaskTCB *selected = NULL;
     //look for the first element of the higer priority queue which is not empty
-    for (int i=0; i<MIN_PRIORITY; i++)
+    int i;
+    for (i=0; i<MIN_PRIORITY; i++)
     {
         if (!empty(&READY_QUEUES[i]))
         {

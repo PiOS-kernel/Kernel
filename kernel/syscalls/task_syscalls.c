@@ -98,7 +98,8 @@ void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
 
 void unknownService(void) {
     for (;;) {
-        for (uint32_t i = 0; i < 0xFFFFF; i++) {
+        uint32_t i;
+        for (i = 0; i < 0xFFFFF; i++) {
             // busy waiting
         }
     }
