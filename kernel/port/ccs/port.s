@@ -5,11 +5,13 @@
     .global task_switch
 	.ref RUNNING
 	.ref schedule
+    .global create_task
 
 tmpKcreate_task:		.word kcreate_task
 tmpUnknownService:		.word unknownService
 tmpRUNNING:	.word RUNNING
 tmpSchedule:	.word schedule
+
 SVCallISR: .asmfunc
     ; Get the SVC number
     ldr r4, [r7, #40]
@@ -86,4 +88,10 @@ scheduling_section:
     ; At the top of the stack there is the return address to the task code
     mov pc, lr
 
+    .endasmfunc
+
+create_task: .asmfunc
+    svc #1
+    mov pc, lr
+    
     .endasmfunc

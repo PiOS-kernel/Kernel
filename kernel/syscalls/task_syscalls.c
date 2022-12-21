@@ -6,14 +6,9 @@
 #include "../utils/utils.h"
 
 /*
-This enum lists all the services that can be requested by an application to
-the kernel.
 Each service has a numeric identifier.
+1 -> create_task
 */
-
-typedef enum {
-    CREATE_TASK_ID = 1,
-} SysCallID;
 
 /*
 This is the system call provided to the user application, in order to
