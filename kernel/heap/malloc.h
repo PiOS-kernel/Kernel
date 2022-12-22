@@ -6,6 +6,6 @@
 #include "heap.h"
 
 #define free(ptr) if (ptr != NULL) {free_segment(&HEAP, (uint8_t*) ptr, sizeof(*ptr));}
-uint8_t* malloc(size_t size);
+uint8_t* alloc(size_t size);
 
 #endif

@@ -2,6 +2,6 @@
 
 /* The great `malloc` */
 
-uint8_t* malloc(size_t size) {
+uint8_t* alloc(size_t size) {
     return allocate_segment(&HEAP, size);
 }

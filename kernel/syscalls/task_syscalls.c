@@ -57,7 +57,7 @@ executed by the task.
 
 void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
     // The task's TCB is created
-    TaskTCB* tcb = (TaskTCB*) malloc(sizeof(TaskTCB));
+    TaskTCB* tcb = (TaskTCB*) alloc(sizeof(TaskTCB));
     TaskTCB_init(tcb, priority);
 
     // The link register is pushed onto the stack, and initialized to be
