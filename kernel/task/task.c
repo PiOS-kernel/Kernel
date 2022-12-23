@@ -117,6 +117,15 @@ TaskTCB* schedule()
         }
     }
 
-    RUNNING = selected; // set the selected task as the running task
-    return selected;
+    // If there was a running task, and the scheduler has selected
+    // a new task to be executed, the previously running task is
+    // inserted back in the ready queue
+    if (RUNNING != NULL && selected != NULL) 
+        enqueue(&READY_QUEUES[RUNNING->priority], RUNNING);
+    
+    if (selected != NULL) {
+        RUNNING = selected; // set the selected task as the running task
+        return selected;
+    }
+    return RUNNING;
 }
