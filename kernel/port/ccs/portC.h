@@ -26,7 +26,6 @@
 
 static const uint32_t MASK24 = 0x00FFFFFF;
 
-
 static const size_t BASE = 0xe000e010;
 
 typedef struct SysTick {

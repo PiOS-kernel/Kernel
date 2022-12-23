@@ -6,5 +6,6 @@
 #include "task/task.h"
 
 void kernel_init();
+void start_scheduler();
 
 #endif

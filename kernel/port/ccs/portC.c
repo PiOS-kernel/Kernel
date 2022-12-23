@@ -1,6 +1,21 @@
 #include "portC.h"
+#include "../../kernel.h"
+#include <stdint.h>
+#define TASK_TIME_UNITS 10
 
+/* Memory mapped address for the NIC control register */
+const uint32_t IRQ_CTRL_REGISTER = 0xE000ED04;
+
+/* Bit representing a pending 'PendSV' exception */
+const uint32_t PEND_SV_BIT = 0x10000000;
+
+/* SysTick configuration structure */
 static SysTick* SYSTICK = (SysTick*)BASE;
+
+/* Counter of the elapsed SysTick time units */
+int TICKS_COUNTER = 0;
+
+/* Code to cofigure and initialize SysTick */
 
 void SysTick_init(int val){
     SYSTICK->CTRL = 0x00000004;

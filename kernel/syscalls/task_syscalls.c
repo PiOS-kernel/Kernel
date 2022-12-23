@@ -5,10 +5,23 @@
 #include "../heap/malloc.h"
 #include "../utils/utils.h"
 
-/*
-Each service has a numeric identifier.
-1 -> create_task
+/* 
+When a task is created its stack is initialized to resemble what it would
+look like if the task was interrupted by an interrupt handler. This is
+the value for exception return.
+WE WILL NEED TO CHANGE THIS VALUE ONCE WE USE 'MSP' and 'PSP'.
 */
+#define INITIAL_EXEC_RETURN 0xFFFFFFF9
+
+/* 
+On exit from an exception or interrupt handler, when the cortex m4 processor
+is running in thumb mode it expects bit[0] of the next instruction to execute to
+be set to 0.
+*/
+#define PC_MASK 0xfffffffe
+
+/* This is the initial value for the XPSR register of a newly created task. */
+const uint32_t INITIAL_XPSR = 0x01000000;
 
 /*
 This is the system call provided to the user application, in order to
@@ -45,14 +58,9 @@ Registers layout for the cortex-M4 processor:
     r15 program counter
 
 Task initialization:
-When a task is prehempted by the SysTick interrupt handler, its
-program counter is saved in the link register. Then the SysTick
-handler calls the routine that performs the context switch, which
-pushes r0 through r12, and r14 (link register) onto the stack.
-Therefore a new task's stack needs to be initialized by pushing
-the necessary values for registers r0-r12 and for the link register,
-which should hold the memory address of the first instruction to be
-executed by the task.
+The initialization of a new task's stack is done by mimicking the
+image of the stack when program execution is interruped by an 
+interrupt handler.
 */
 
 void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
@@ -60,25 +68,34 @@ void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
     TaskTCB* tcb = (TaskTCB*) alloc(sizeof(TaskTCB));
     TaskTCB_init(tcb, priority);
 
-    // The link register is pushed onto the stack, and initialized to be
-    // the memory address of the first instruction executed by the task
-    stack_push(tcb, (uint8_t*) &code, sizeof(void *));
+    uint32_t zeros[12];
+    memset((uint8_t*) zeros, 0, sizeof(uint32_t) * 12);
 
-    // Registers r1 through r12 are pushed onto the stack and
-    // 0-initialized.
-    // 12 * 4 bytes are copied to the stack, where 4 bytes is the size of
-    // one register.
-    size_t zeros[12];
-    memset((uint8_t*) zeros, 0, sizeof(size_t) * 12);
-    // The memory address of the first item in the array is given as source
-    stack_push(tcb, (uint8_t*) &zeros[0], sizeof(size_t) * 12);
+    // The XPSR register is pushed onto the stack.
+    tcb->stp -= 4;
+    *((uint32_t*) tcb->stp) = INITIAL_XPSR;
 
-    // The pointer to the arguments is saved in register r0.
-    // The ARM ABI specifies that the first 4 32-bit function arguments
-    // should be put in registers r0-r3.
+    // The program counter is pushed onto the stack. It will contain a
+    // pointer to the task's entry point.
+    tcb->stp -= 4;
+    *((uint32_t*) tcb->stp) = (uint32_t) code & PC_MASK;
+
+    // Then the link register is pushed and initialized to 0.
+    stack_push(tcb, (uint8_t*) zeros, sizeof(uint32_t));
+
+    // Then r12, r3, r2, r1, and r0 are pushed onto the stack. Only r0
+    // has a non-zero value, which is the pointer to the arguments.
+    stack_push(tcb, (uint8_t*) zeros, sizeof(uint32_t) * 4);
     stack_push(tcb, (uint8_t*) &args, sizeof(void *));
 
-    tcb->stp = stack_end(tcb) - 14 * 4;
+    // Now the execution return value from the ISR is pushed onto the stack.
+    tcb->stp -= 4;
+    *((uint32_t*) tcb->stp) = INITIAL_EXEC_RETURN;
+
+    // Finally, registers r4 through r11 are pushed onto the stack and
+    // 0-initialized.
+    stack_push(tcb, (uint8_t*) zeros, sizeof(size_t) * 8);
+
     // The task is inserted into the tasks queue
     enqueue(&READY_QUEUES[priority], tcb);
 }
