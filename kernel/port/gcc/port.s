@@ -27,7 +27,7 @@ SVCallISR:
 
 @ This function does the context switch for a task.
 @ It stores the current values in the registers to the current task's stack,
-@ calls the schedule function, and loads the new task's stack in the registers.
+@ calls the schedule function, and loads the new task's registers.
 .thumb_func
 .global task_switch
 task_switch:
@@ -36,6 +36,7 @@ task_switch:
 
     @ r0 is loaded with the pointer to the running task
     ldr r0, =RUNNING
+    ldr r0, [r0]
     
     @ SAVE:
     @ Because the first 32 bits of the TaskTCB struct are dedicated to the stack
@@ -50,34 +51,33 @@ task_switch:
     @ IF WE WHERE USING 'MSP' AND 'PSP', HERE WE WOULD NEED TO LOAD THE
     @ TASK'S STACK POINTER INTO 'R13' BEFORE SAVING THE REGISTERS
     @ The task's registers are saved onto the stack
-    stmdb r13!, {r4-r12, r14}  
+    stmdb r13!, {r4-r11}  
     @ The stack pointer is saved in the task's struct
     str r13, [r0] 
 
     @ SCHEDULING:
     @ the scheduling algorithm determines wich task should be executed
-    _scheduling_section: STMDB r13!, {r14}
+_scheduling_section:
+    push {lr}
     bl schedule
-    ldmia r13!, {r14}
+    pop {lr}
 
     @ RESUME:
     @ according to the ARM ABI convention the return value of 'schedule()',
     @ which is the pointer to the new running task, is saved in register r0
 
     @ the first struct field is the SP
-    ldr r13, [r0, #0]
+    ldr r13, [r0]
     @ the task's registers are popped from the stack
-    ldmia r13!, {r0-r12}
+    ldmia r13!, {r4-r11}
 
     @ Interrupts are enabled again
     cpsie i
     @ The register that tracks the current privilege level of the CPU
     @ is modified to return to user mode
-    stmdb r13!, {r0}
     mov r0, #1
     msr basepri, r0
     isb
-    ldmia r13!, {r0}
     @ At the top of the stack there is the return address to the task code
     mov pc, lr
 

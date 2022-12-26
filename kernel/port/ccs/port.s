@@ -2,7 +2,7 @@
     .global SVCallISR
     .global task_switch
     .global create_task
-    .global execute_first_task
+    .global start_scheduler
     .global SysTick_Handler
     .global PendSV_Handler
 	.ref kcreate_task
@@ -46,7 +46,7 @@ callService:
 ; -------------
 ; This function does the context switch for a task.
 ; It stores the current values in the registers to the current task's stack,
-; calls the schedule function, and loads the new task's stack in the registers.
+; calls the schedule function, and loads the new task's registers.
 
 task_switch: .asmfunc
     ; Interrupts are disabled
@@ -112,7 +112,7 @@ scheduling_section:
 ; perform a context switch to the task that has been created at system
 ; boot time.
 
-execute_first_task: .asmfunc
+start_scheduler: .asmfunc
     ; The PendSV handler is triggered
     ldr r0, constIRQ_CTRL_REGISTER
     ldr r1, constPEND_SV_BIT
