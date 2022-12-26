@@ -106,9 +106,16 @@ int count_tasks( Queue* q)
 TaskTCB* schedule() 
 {
     TaskTCB *selected = NULL;
-    //look for the first element of the higer priority queue which is not empty
+
+    // get the priority of the running task
+    int running_priority = MIN_PRIORITY - 1;
+    if (RUNNING != NULL)
+        running_priority = RUNNING->priority;
+
+    // look for a task in the ready queues with a priority higher or equal
+    // to the priority of the running task
     int i;
-    for (i=0; i<MIN_PRIORITY; i++)
+    for (i=0; i<=running_priority; i++)
     {
         if (!empty(&READY_QUEUES[i]))
         {
