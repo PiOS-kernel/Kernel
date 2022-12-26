@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-void create_task(void (*code)(void *), void* args, uint8_t priority) __attribute__ ( (  naked ) );
+void create_task(void (*code)(void *), void* args, uint8_t priority);
 void kcreate_task(void (*code)(void *), void *args, uint8_t priority);
 void task_switch();
 
