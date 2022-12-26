@@ -18,7 +18,7 @@ On exit from an exception or interrupt handler, when the cortex m4 processor
 is running in thumb mode it expects bit[0] of the next instruction to execute to
 be set to 0.
 */
-#define PC_MASK 0xfffffffe
+#define PC_MASK 0xFFFFFFFE
 
 /* This is the initial value for the XPSR register of a newly created task. */
 const uint32_t INITIAL_XPSR = 0x01000000;
