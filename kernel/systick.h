@@ -1,5 +1,5 @@
-#ifndef __PORT_H__
-#define __PORT_H__
+#ifndef __SYSTICK_H__
+#define __SYSTICK_H__
 
 #include <stdint.h>
 #include <stddef.h>
@@ -29,42 +29,11 @@ static const uint32_t MASK24 = 0x00FFFFFF;
 static const size_t BASE = 0xe000e010;
 
 typedef struct SysTick {
-
     uint32_t CTRL __attribute__((aligned(4)));
     uint32_t RELOAD __attribute__((aligned(4)));
     uint32_t CURRENT __attribute__((aligned(4)));
     uint32_t CALIB __attribute__((aligned(4)));
-
-
-
-    /* wrong implementation
-    volatile struct Ctrl {
-        
-        struct Bits {
-            uint32_t ENABLE : 1;  // Counter enable
-            uint32_t TICKINT : 1;  // SysTick exception request enable
-            uint32_t CLKSOURCE : 1;  // Clock source selection
-            uint32_t : 13;
-            uint32_t COUNTFLAG : 1;  // Returns 1 if timer counted to 0 since last time this was read.
-            uint32_t : 15;
-        } b;
-
-    } CTRL; // SysTick control and status register
-
-    volatile struct Load {
-
-    } LOAD; // SysTick reload value register
-
-    volatile struct Val {
-
-    } VAL; // SysTick reload value register
-
-    volatile struct Calib {
-
-    } CALIB; // SysTick calibration value register
-    */
-
-}SysTick;
+} SysTick;
 
 /**
  * @brief SysTick module initialization
