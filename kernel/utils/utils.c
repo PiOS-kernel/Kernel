@@ -14,7 +14,7 @@ void memcpy(uint8_t* src, uint8_t* dst, int size)
 
 void memset(uint8_t* str, uint8_t c, size_t n)
 {
-    unsigned char *s = (unsigned char *)str;
+    uint8_t *s = (uint8_t *)str;
     while (n--)
-        *s++ = (unsigned char)c;
+        *s++ = (uint8_t)c;
 }
