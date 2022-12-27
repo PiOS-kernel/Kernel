@@ -90,3 +90,28 @@ _scheduling_section:
 create_task:
     svc #1
     mov pc, lr
+
+@ -----------------------------------------------------------
+
+@ The following arte utilities for activating and deactivating interrupts
+.thumb_func
+.global activate_interrupts
+activate_interrupts:
+    cpsid i
+
+.thumb_func
+.global deactivate_interrupts
+deactivate_interrupts:
+    cpsie i
+
+.thumb_func
+.global PendSVTrigger
+.extern IRQ_CTRL_REGISTER
+PendSVTrigger:
+@ The PendSV handler is triggered
+    ldr r0, =IRQ_CTRL_REGISTER
+    ldr r1, =PEND_SV_BIT
+    ldr r0, [r0]
+    ldr r1, [r1]
+    str r1, [r0]
+@ -----------------------------------------------------------
