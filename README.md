@@ -15,3 +15,11 @@ The source code is in the [kernel](kernel) directory, divided into the different
 * The [utils](kernel/utils) directory contains some utility code.
 * Finally, in the [port](kernel/port) directory you can find source code that is
 specific to the compiler used to build an application that links against πOS. Much of that code is written in assembly.
+
+
+## Unit tests
+
+To run unit tests, you have two options:
+* ```make test``` to run tests on qemu directly.
+* ```make gdb``` to run tests with GDB. Have a look at the README at
+[this link](https://github.com/PiOS-kernel/testing) to learn more about testing with GDB.
