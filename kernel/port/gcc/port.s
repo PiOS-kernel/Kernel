@@ -9,13 +9,20 @@
 SVCallISR:
     @ Get the SVC number
     ldr r4, [sp, #24]
-    ldrb r4, [r4, #-2] @ -2 
+    ldrb r4, [r4, #-2]
 
     @ Dispatch to the requested service
     cmp r4, #0x1
     itt eq
     ldreq r5, =kcreate_task
     beq _callService
+
+    cmp r4, #0x2
+    itt eq
+    ldreq r5, =kexit
+    beq _callService
+
+    @ No service corresponding to the SVC number is found
     ldr r5, =unknownService
 
     @ Call the service
@@ -91,19 +98,29 @@ create_task:
     svc #1
     mov pc, lr
 
+
+@ -----------------------------------------------------------
+
+@ The system call that allows a task to terminate itself
+.thumb_func
+.global exit
+exit:
+    svc #2
+    mov pc, lr
+
 @ -----------------------------------------------------------
 
 @ The following arte utilities for activating and deactivating interrupts
 .thumb_func
 .global enable_interrupts
 enable_interrupts:
-    cpsid i
+    cpsie i
     bx lr
 
 .thumb_func
 .global disable_interrupts
 disable_interrupts:
-    cpsie i
+    cpsid i
     bx lr
 
 .thumb_func
