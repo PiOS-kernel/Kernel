@@ -79,7 +79,7 @@ void SysTick_setLOAD(int x){
     SYSTICK->RELOAD = value;
 }
 
-void SystTick_reset() {
+void SysTick_reset() {
     SYSTICK->CURRENT = 0x00000000;
     TICKS_COUNTER = 0;
 }
