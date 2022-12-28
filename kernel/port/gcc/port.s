@@ -95,14 +95,16 @@ create_task:
 
 @ The following arte utilities for activating and deactivating interrupts
 .thumb_func
-.global activate_interrupts
-activate_interrupts:
+.global enable_interrupts
+enable_interrupts:
     cpsid i
+    bx lr
 
 .thumb_func
-.global deactivate_interrupts
-deactivate_interrupts:
+.global disable_interrupts
+disable_interrupts:
     cpsie i
+    bx lr
 
 .thumb_func
 .global PendSVTrigger
