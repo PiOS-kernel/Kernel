@@ -25,6 +25,18 @@ SVCallISR:
 
 @ -----------------------------------------------------------
 
+@ This is the PendSV handler needed for the context switch
+.thumb_func
+.global PendSV_Handler
+PendSV_Handler:
+    @ The task switch is performed
+    push {lr}
+    bl task_switch
+    pop {pc}
+
+
+@ -----------------------------------------------------------
+
 @ This function does the context switch for a task.
 @ It stores the current values in the registers to the current task's stack,
 @ calls the schedule function, and loads the new task's registers.
@@ -111,9 +123,12 @@ disable_interrupts:
 .extern IRQ_CTRL_REGISTER
 PendSVTrigger:
 @ The PendSV handler is triggered
-    ldr r0, =IRQ_CTRL_REGISTER
-    ldr r1, =PEND_SV_BIT
-    ldr r0, [r0]
-    ldr r1, [r1]
+    ldr r0, IRQ_CTRL_REGISTER
+    ldr r1, PEND_SV_BIT
+    @ ldr r0, [r0]
+    @ ldr r1, [r1]
     str r1, [r0]
+    bx lr
 @ -----------------------------------------------------------
+IRQ_CTRL_REGISTER: .word 0xE000ED04
+PEND_SV_BIT: .word 0x10000000
