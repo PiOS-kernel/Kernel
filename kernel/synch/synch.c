@@ -7,11 +7,11 @@ const uint32_t IRQ_CTRL_REGISTER = 0xE000ED04;
 /* Bit representing a pending 'PendSV' exception */
 const uint32_t PEND_SV_BIT = 0x10000000;
 
-extern void activate_interrupts(void);
-extern void deactivate_interrupts(void);
+extern void enable_interrupts(void);
+extern void disable_interrupts(void);
 extern void PendSVTrigger(void);
 
-MCB* MCB_init(void) {
+MCB* mutex_init(void) {
     MCB* mcb = (MCB*) alloc(sizeof(MCB));
     mcb->lock = 0;
     mcb->owner = NULL;
@@ -19,27 +19,27 @@ MCB* MCB_init(void) {
 }
 
 uint8_t MCB_wait(MCB* lock){
-    deactivate_interrupts();
+    disable_interrupts();
     if(lock->lock == 0){
         lock->lock = 1;
         lock->owner = RUNNING;
-        activate_interrupts();
+        enable_interrupts();
         return 1;
     } else{
-        activate_interrupts();
+        enable_interrupts();
         return 0;
     }
 }
 
 uint8_t MCB_post(MCB* lock){
-    deactivate_interrupts();
+    disable_interrupts();
     if(lock->lock == 1 && lock->owner == RUNNING){
         lock->lock = 0;
         lock->owner = NULL;
-        activate_interrupts();
+        enable_interrupts();
         return 1;
     }
-    activate_interrupts();
+    enable_interrupts();
     return 0;
 }
 
