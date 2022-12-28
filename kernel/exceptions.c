@@ -1,6 +1,5 @@
-#ifndef __SYSTICK_H__
-#define __SYSTICK_H__
-
+#include "exceptions.h"
+#include "kernel.h"
 #include <stdint.h>
 #include <stddef.h>
 
@@ -24,10 +23,6 @@
 #define BIT(x)                                 ((uint16_t)1 << (x))
 /*------------*/
 
-static const uint32_t MASK24 = 0x00FFFFFF;
-
-static const size_t BASE = 0xe000e010;
-
 typedef struct SysTick {
     uint32_t CTRL __attribute__((aligned(4)));
     uint32_t RELOAD __attribute__((aligned(4)));
@@ -35,25 +30,56 @@ typedef struct SysTick {
     uint32_t CALIB __attribute__((aligned(4)));
 } SysTick;
 
-/**
- * @brief SysTick module initialization
- *      set CTRL to default values
- *      clean all other register
- *      set CALIB according to specs:
- *          set 31st and 30th bit to ZERO (CLEAN),
- *          set [23th-0th] bits to ONE (SET) -> VALUE IS NOT CORRECT, NEED TO INCREASE OVERALL CLOCK
- */
-void SysTick_init(int val);
-void SysTick_enable();
-void SysTick_disable();
+/* Number of time units dedicated to a single task, before interrupting it */
 
-/**
- * @brief to update LOAD register value
- * [23-0] bits are accessible; other are reserved
- * 
- * @param x number of ticks before triggering interrupt
- *      qemu -> 12MHz clock
- */
-void SysTick_setLOAD(int x);
+#define TASK_TIME_UNITS 10
 
-#endif
+static const uint32_t MASK24 = 0x00FFFFFF;
+
+/* Memory mapped address for the SysTick configuration structure */
+static const size_t BASE = 0xe000e010;
+
+/* Memory mapped address for the NIC control register */
+const uint32_t IRQ_CTRL_REGISTER = 0xE000ED04;
+
+/* Bit representing a pending 'PendSV' exception */
+const uint32_t PEND_SV_BIT = 0x10000000;
+
+/* SysTick configuration structure */
+static SysTick* SYSTICK = (SysTick*)BASE;
+
+/* Counter of the elapsed SysTick time units */
+int TICKS_COUNTER = 0;
+
+/* Code to cofigure and initialize SysTick */
+
+void SysTick_init(int val){
+    SYSTICK->CTRL = 0x00000004;
+    SYSTICK->RELOAD = 0x00000000;
+    SYSTICK->CURRENT = 0x00000000;
+
+    // set 31st and 30th bit to ZERO (CLEAN)
+    // set [23th-0th] bits to ONE (SET) -> VALUE IS NOT CORRECT, NEED TO INCREASE OVERALL CLOCK
+    SYSTICK->CALIB &= ~(0xC0000000);
+    SYSTICK->CALIB |= MASK24;
+
+    SysTick_setLOAD(val);
+}
+
+void SysTick_enable(){
+    SYSTICK->CTRL = 0x00000007;
+}
+
+void SysTick_disable(){
+    SYSTICK->CTRL = 0x00000004;
+}
+
+void SysTick_setLOAD(int x){
+    uint32_t value = x & MASK24;
+    SYSTICK->RELOAD = value;
+}
+
+void SystTick_reset() {
+    SYSTICK->CURRENT = 0x00000000;
+    TICKS_COUNTER = 0;
+}
