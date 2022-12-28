@@ -97,13 +97,13 @@ create_task:
 .thumb_func
 .global enable_interrupts
 enable_interrupts:
-    cpsid i
+    cpsie i
     bx lr
 
 .thumb_func
 .global disable_interrupts
 disable_interrupts:
-    cpsie i
+    cpsid i
     bx lr
 
 .thumb_func
