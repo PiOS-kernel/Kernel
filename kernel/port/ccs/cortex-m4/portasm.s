@@ -5,6 +5,10 @@
     .global start_scheduler
     .global SysTick_Handler
     .global PendSV_Handler
+    .global exit
+    .global enable_interrupts
+    .global disable_interrupts
+    .global PendSVTrigger
 	.ref kcreate_task
 	.ref unknownService
 	.ref RUNNING
@@ -31,9 +35,16 @@ SVCallISR: .asmfunc
     ; Dispatch to the requested service
     cmp r4, #0x1
     itt eq
-    ldreq r5, constKcreate_task
+    ldreq r5, =kcreate_task
+    beq _callService
+
+    cmp r4, #0x2
+    itt eq
+    ldreq r5, =kexit
     beq callService
-    ldr r5, constUnknownService
+
+    ; No service corresponding to the SVC number is found
+    ldr r5, =unknownService
 
     ; Call the service
 callService:
@@ -170,4 +181,39 @@ create_task: .asmfunc
     svc #1
     mov pc, lr
     
+    .endasmfunc
+
+; ----------------------------------------------------------- 
+; The system call that allows a task to terminate itself 
+exit: .asmfunc
+    svc #2 
+    mov pc, lr 
+
+    .endasmfunc
+
+
+; ----------------------------------------------------------- 
+; The following are utilities for activating and deactivating interrupts 
+enable_interrupts: .asmfunc
+    cpsie i 
+    bx lr 
+
+    .endasmfunc
+
+disable_interrupts: .asmfunc
+    cpsid i 
+    bx lr 
+
+    .endasmfunc
+
+PendSVTrigger: .asmfunc
+
+    ; The PendSV handler is triggered 
+    ldr r0, constIRQ_CTRL_REGISTER 
+    ldr r1, constPEND_SV_BIT 
+    ldr r0, [r0] 
+    ldr r1, [r1] 
+    str r1, [r0] 
+    bx lr 
+
     .endasmfunc
