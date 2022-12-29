@@ -33,12 +33,11 @@ _callService:
     
 
 @ ------------- 
-@ This function does the context switch for a task. 
-@ It stores the current values in the registers to the current task's stack, 
-@ calls the schedule function, and loads the new task's registers. 
+@ The PendSV ISR, which calls the scheduler to perform a context switch 
+
 .thumb_func
-.global task_switch
-task_switch:
+.global PendSV_Handler
+PendSV_Handler:
     @ Interrupts are disabled 
     cpsid i 
     
@@ -59,7 +58,7 @@ task_switch:
     @ IF WE WHERE USING 'MSP' AND 'PSP', HERE WE WOULD NEED TO LOAD THE 
     @ TASK'S STACK POINTER INTO 'R13' BEFORE SAVING THE REGISTERS 
     
-    @ The task's coreregisters are saved onto the stack 
+    @ The task's core registers are saved onto the stack 
     @ It is not necessary to save other registers because this function 
     @ is always called from the PendSV ISR, which saves and restores r0-r3, 
     @ r12, r14, r15 and XPSR. 
@@ -92,7 +91,7 @@ scheduling_section:
     msr basepri, r0 
     isb 
     
-    mov pc, lr 
+    bx lr 
     
 
 @ ------------- 
@@ -109,16 +108,6 @@ start_scheduler:
     ldr r1, [r1] 
     str r1, [r0] 
     
-
-@ ------------- 
-@ The PendSV ISR, which calls the scheduler to perform a context switch 
-.thumb_func
-.global PendSV_Handler
-PendSV_Handler:
-    @ The task switch is performed 
-    push {lr} 
-    bl task_switch 
-    pop {pc} 
 
 @ ------------- 
 @ The SysTick ISR 
