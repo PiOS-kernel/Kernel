@@ -35,7 +35,7 @@ SVCallISR: .asmfunc
     ; Dispatch to the requested service
     cmp r4, #0x1
     itt eq
-    ldreq r5, =kcreate_task
+    ldreq r5, constKcreate_task
     beq _callService
 
     cmp r4, #0x2
