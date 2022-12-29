@@ -1,9 +1,10 @@
 #include "syscalls.h"
 #include "../task/task.h"
-#include "stddef.h"
-#include "stdint.h"
 #include "../heap/malloc.h"
 #include "../utils/utils.h"
+#include "../exceptions.h"
+#include <stddef.h>
+#include <stdint.h>
 
 /* 
 When a task is created its stack is initialized to resemble what it would
@@ -33,8 +34,15 @@ The function simply invokes the kernel to request the given service.
 extern void create_task(void (*code)(void *), void* args, uint8_t priority);
 
 /*
+This is the system call provided to the user application to terminate execution
+of the current task.
+*/
 
-kcreate_task(), brief description:
+extern void exit();
+
+/*
+
+Kernel space implementation for create_task(), brief description:
 This is the function used by the kernel to create a new task
 The functions pushes onto the task's empty stack the initial values
 for its register. Then the task is added to the tasks queue.
@@ -98,6 +106,24 @@ void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
 
     // The task is inserted into the tasks queue
     enqueue(&READY_QUEUES[priority], tcb);
+}
+
+/*
+This is the kernel space implementation of the exit() system call.
+*/
+
+void kexit() {
+    // The TaskTCB of the currently running task is deallocated.
+    free(RUNNING);
+
+    // The pointer to the running task is set to NULL
+    RUNNING = NULL;
+
+    // Then the SysTick counter is reset.
+    SysTick_reset();
+    
+    // Finally the scheduler is invoked.
+    PendSVTrigger();
 }
 
 void unknownService(void) {

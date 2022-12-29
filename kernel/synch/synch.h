@@ -14,4 +14,7 @@ MCB* mutex_init(void);
 void mutex_wait(MCB* lock);
 void mutex_post(MCB* lock);
 
+extern void enable_interrupts(void);
+extern void disable_interrupts(void);
+
 #endif
