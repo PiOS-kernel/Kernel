@@ -2,13 +2,13 @@ LDFILE=testing/linker.ld
 LIBPATH=build/libpios.a
 TESTSPATH=build/tests.elf
 
-KERNELFILES_C=$(subst .c,.o,$(wildcard kernel/*/*.c kernel/*.c))
-KERNELFILES_S=$(subst .s,.o,$(wildcard kernel/port/gcc/*.s))
+KERNELFILES_C=$(subst .c,.o,$(wildcard kernel/port/gcc/cortex-m3/*.c kernel/*/*.c kernel/*.c))
+KERNELFILES_S=$(subst .s,.o,$(wildcard kernel/port/gcc/cortex-m3/*.s))
 TESTSFILES_C=$(subst .c,.o,$(wildcard testing/*/*.c testing/*.c))
 TESTSFILES_S=$(subst .s,.o,$(wildcard testing/*.s))
 
 BUILDFILES_C=$(subst kernel/,build/,$(KERNELFILES_C))
-BUILDFILES_S=$(subst kernel/port/gcc/,build/,$(KERNELFILES_S))
+BUILDFILES_S=$(subst kernel/port/gcc/cortex-m3,build/,$(KERNELFILES_S))
 
 BUILDTESTING_C=$(subst testing/,build/,$(TESTSFILES_C)) $(BUILDFILES_C)
 BUILDTESTING_S=$(subst testing/,build/,$(TESTSFILES_S)) $(BUILDFILES_S)
@@ -35,7 +35,7 @@ build/%.o: testing/%.c
 	@arm-none-eabi-gcc -Wall -O0 -mcpu=cortex-m3 -mthumb --freestanding -nostartfiles -ggdb -c $^ -o build/$(notdir $@)
 
 # Rules for S files
-build/%.o: kernel/port/gcc/%.s
+build/%.o: kernel/port/gcc/cortex-m3/%.s
 	@[ -d build ] || mkdir build
 	@arm-none-eabi-as --warn --fatal-warnings -mcpu=cortex-m3 -ggdb $^ -o $@
 

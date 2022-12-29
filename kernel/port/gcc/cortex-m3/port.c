@@ -1,4 +1,6 @@
 #include "../../../task/task.h"
+#include "../../../utils/utils.h"
+#include "../../../heap/malloc.h"
 
 /* 
 On exit from an exception or interrupt handler, when the cortex m4 processor
