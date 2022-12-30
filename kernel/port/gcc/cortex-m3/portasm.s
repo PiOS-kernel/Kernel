@@ -40,7 +40,8 @@ _callService:
 PendSV_Handler:
     @ Interrupts are disabled 
     cpsid i 
-    
+    isb
+
     @ r0 is loaded with the pointer to the running task 
     ldr r0, =RUNNING 
     ldr r0, [r0] 
@@ -87,8 +88,13 @@ scheduling_section:
     cpsie i 
     @ The register that tracks the current privilege level of the CPU 
     @ is modified to return to user mode 
-    mov r0, #1 
-    msr basepri, r0 
+    @ -----------------
+    @ it stays in kernel mode -> for test purpose, until syscall yield() is implemented
+
+    @ mov r0, #1 
+    @ msr basepri, r0 
+
+    @ -----------------
     isb 
     
     bx lr 
@@ -163,27 +169,37 @@ exit:
 .thumb_func
 .global enable_interrupts
 enable_interrupts:
-    cpsie i 
-    bx lr 
+    @cpsie i 
+    @bx lr
+    mov r0, #0
+    msr basepri, r0
+    bx lr
+
     
 
 .thumb_func
 .global disable_interrupts
 disable_interrupts:
-    cpsid i 
-    bx lr 
-    
+    @ cpsid i 
+    @ bx lr 
+    mov r0, 191
+    msr basepri, r0
+    isb
+    dsb
+    bx lr
+
 
 .thumb_func
 .global PendSVTrigger
 PendSVTrigger:
     
     @ The PendSV handler is triggered 
+    cpsid i
     ldr r0, =IRQ_CTRL_REGISTER 
     ldr r1, =PEND_SV_BIT 
     ldr r0, [r0] 
     ldr r1, [r1] 
-    str r1, [r0] 
+    str r1, [r0]
+    cpsie i
     bx lr 
     
-
