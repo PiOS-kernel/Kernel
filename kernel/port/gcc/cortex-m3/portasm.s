@@ -92,7 +92,7 @@ scheduling_section:
     @ it stays in kernel mode -> for test purpose, until syscall yield() is implemented
 
     @ mov r0, #1 
-    @ msr basepri, r0 
+    @ msr control, r0
 
     @ -----------------
     isb 
