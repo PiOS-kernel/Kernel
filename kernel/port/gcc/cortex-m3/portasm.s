@@ -169,24 +169,15 @@ exit:
 .thumb_func
 .global enable_interrupts
 enable_interrupts:
-    @cpsie i 
-    @bx lr
-    mov r0, #0
-    msr basepri, r0
+    cpsie i 
     bx lr
-
     
 
 .thumb_func
 .global disable_interrupts
 disable_interrupts:
-    @ cpsid i 
-    @ bx lr 
-    mov r0, 191
-    msr basepri, r0
-    isb
-    dsb
-    bx lr
+    cpsid i 
+    bx lr 
 
 
 .thumb_func
