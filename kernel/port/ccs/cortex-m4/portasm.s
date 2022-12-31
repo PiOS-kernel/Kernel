@@ -10,6 +10,7 @@
     .global disable_interrupts
     .global PendSVTrigger
 	.ref kcreate_task
+    .ref kexit
 	.ref unknownService
 	.ref RUNNING
 	.ref TICKS_COUNTER
@@ -19,6 +20,7 @@
 	.ref PEND_SV_BIT
 
 constKcreate_task:		    .word kcreate_task
+constKexit:                 .word kexit
 constUnknownService:		.word unknownService
 constSchedule:	            .word schedule
 constRUNNING:	            .word RUNNING
@@ -36,15 +38,15 @@ SVCallISR: .asmfunc
     cmp r4, #0x1
     itt eq
     ldreq r5, constKcreate_task
-    beq _callService
+    beq callService
 
     cmp r4, #0x2
     itt eq
-    ldreq r5, =kexit
+    ldreq r5, constKexit
     beq callService
 
     ; No service corresponding to the SVC number is found
-    ldr r5, =unknownService
+    ldr r5, constUnknownService
 
     ; Call the service
 callService:
