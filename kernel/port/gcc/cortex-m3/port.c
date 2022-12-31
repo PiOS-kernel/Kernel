@@ -15,6 +15,10 @@ const uint32_t INITIAL_XPSR = 0x01000000;
 
 /* Port specific implementation of kcreate_task */
 
+/* references needed by PendSVTrigger */
+#define IRQ_CTRL_REGISTER     ( *( ( volatile uint32_t * ) 0xe000ed04 ) )
+#define PEND_SV_BIT    ( 1UL << 28UL )
+
 void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
     // The task's TCB is created
     TaskTCB* tcb = (TaskTCB*) alloc(sizeof(TaskTCB));
