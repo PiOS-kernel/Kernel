@@ -13,7 +13,8 @@ void kernel_init() {
 
     // Initialize scheduler data structures
     RUNNING = NULL;
-    for (int i=0; i<MIN_PRIORITY; i++) {
+    int i=0;
+    for (; i<MIN_PRIORITY; i++) {
         Queue_init(&WAITING_QUEUES[i]);
         Queue_init(&READY_QUEUES[i]);
     }

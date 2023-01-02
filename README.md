@@ -25,7 +25,7 @@ To run unit tests, you have two options:
 [this link](https://github.com/PiOS-kernel/testing) to learn more about testing with GDB.
 
 
-# Transpiling Assembly code
+## Transpiling Assembly code
 
 In the root directory you can find a [transpiler](transpiler.py) that allows to translate gcc assembly code to ccs assembly code, and vice versa. 
 

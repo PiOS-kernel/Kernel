@@ -74,7 +74,8 @@ TaskTCB* dequeue (Queue* q){
         if (old_head->next != NULL)
         {
             // shift the head to the following element in the queue 
-            q->head = old_head->next; 
+            q->head = old_head->next;
+            old_head->next = NULL;
         }
         else
         {

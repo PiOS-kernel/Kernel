@@ -1,27 +1,10 @@
 #include "syscalls.h"
 #include "../task/task.h"
-#include "stddef.h"
-#include "stdint.h"
 #include "../heap/malloc.h"
 #include "../utils/utils.h"
-
-/* 
-When a task is created its stack is initialized to resemble what it would
-look like if the task was interrupted by an interrupt handler. This is
-the value for exception return.
-WE WILL NEED TO CHANGE THIS VALUE ONCE WE USE 'MSP' and 'PSP'.
-*/
-#define INITIAL_EXEC_RETURN 0xFFFFFFF9
-
-/* 
-On exit from an exception or interrupt handler, when the cortex m4 processor
-is running in thumb mode it expects bit[0] of the next instruction to execute to
-be set to 0.
-*/
-#define PC_MASK 0xFFFFFFFE
-
-/* This is the initial value for the XPSR register of a newly created task. */
-const uint32_t INITIAL_XPSR = 0x01000000;
+#include "../exceptions.h"
+#include <stddef.h>
+#include <stdint.h>
 
 /*
 This is the system call provided to the user application, in order to
@@ -33,8 +16,26 @@ The function simply invokes the kernel to request the given service.
 extern void create_task(void (*code)(void *), void* args, uint8_t priority);
 
 /*
+This is the system call provided to the user application to terminate execution
+of the current task.
+*/
 
-kcreate_task(), brief description:
+extern void exit();
+
+/* 
+On exit from an exception or interrupt handler, when the cortex m4 processor
+is running in thumb mode it expects bit[0] of the next instruction to execute to
+be set to 0.
+*/
+
+#define PC_MASK 0xFFFFFFFE
+
+/* This is the initial value for the XPSR register of a newly created task. */
+const uint32_t INITIAL_XPSR = 0x01000000;
+
+/*
+
+Kernel space implementation for create_task(), brief description:
 This is the function used by the kernel to create a new task
 The functions pushes onto the task's empty stack the initial values
 for its register. Then the task is added to the tasks queue.
@@ -57,7 +58,6 @@ Registers layout for the cortex-M4 processor:
     r14 link register
     r15 program counter
 
-Task initialization:
 The initialization of a new task's stack is done by mimicking the
 image of the stack when program execution is interruped by an 
 interrupt handler.
@@ -88,16 +88,30 @@ void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
     stack_push(tcb, (uint8_t*) zeros, sizeof(uint32_t) * 4);
     stack_push(tcb, (uint8_t*) &args, sizeof(void *));
 
-    // Now the execution return value from the ISR is pushed onto the stack.
-    tcb->stp -= 4;
-    *((uint32_t*) tcb->stp) = INITIAL_EXEC_RETURN;
-
     // Finally, registers r4 through r11 are pushed onto the stack and
     // 0-initialized.
     stack_push(tcb, (uint8_t*) zeros, sizeof(size_t) * 8);
 
     // The task is inserted into the tasks queue
     enqueue(&READY_QUEUES[priority], tcb);
+}
+
+/*
+This is the kernel space implementation of the exit() system call.
+*/
+
+void kexit() {
+    // The TaskTCB of the currently running task is deallocated.
+    free(RUNNING);
+
+    // The pointer to the running task is set to NULL
+    RUNNING = NULL;
+
+    // Then the SysTick counter is reset.
+    SysTick_reset();
+    
+    // Finally the scheduler is invoked.
+    PendSVTrigger();
 }
 
 void unknownService(void) {

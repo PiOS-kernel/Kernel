@@ -202,7 +202,7 @@ class CCStoGCCTranspiler(Transpiler):
 
     def transpile(self):
         # Write the header
-        self.write_line(".cpu cortex-m4")
+        self.write_line(".cpu cortex-m3")
         self.write_line(".thumb")
         self.write_line(".syntax unified\n")
         self.write_line("@ -----------------------------------------------------------\n")

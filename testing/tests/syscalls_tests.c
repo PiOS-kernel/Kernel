@@ -21,12 +21,6 @@ bool test_create_task() {
         stack_top += 1;
     }
 
-    // The following element on the task's stack should be the
-    // exec return value from an interrupt handler
-    ASSERT(*stack_top == 0xFFFFFFF9);
-
-    // Then we should find the pointer to the task's arguments
-    stack_top += 1;
     ASSERT(*stack_top == (uint32_t) name);
     
     // Then we should find registers r1-r3 and r12 set to 0.
