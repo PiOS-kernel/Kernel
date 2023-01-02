@@ -14,6 +14,7 @@ MCB* semaphore_init(uint32_t c){
     MCB* mcb = (MCB*) alloc(sizeof(MCB));
     mcb->lock = 0;
     mcb->owner = NULL;
+    if(c < 1){ return NULL; }
     if(c == 1){
         mcb->type = SEMAPHORE_BIN;
     } else{
@@ -50,7 +51,7 @@ uint8_t mutex_post(MCB* lock){
 
 uint8_t sem_wait(MCB* lock){
     disable_interrupts();
-    if(lock->lock == 0){
+    if(lock->lock < lock->count){
         lock->lock += 1;
         enable_interrupts();
         return 1;
@@ -73,13 +74,17 @@ uint8_t sem_post(MCB* lock){
 
 void synch_wait(MCB* lock){
     if(lock->type == MUTEX){
-        while(!mutex_wait(lock));
+        while(!mutex_wait(lock)){
+            PendSVTrigger();
+        };
     } else {
-        while(!sem_wait(lock));
+        while(!sem_wait(lock)){
+            PendSVTrigger();
+        };
     }
     // priority inheritance ?
     // call context switch
-    PendSVTrigger();
+    
 }
 
 void synch_post(MCB* lock){
