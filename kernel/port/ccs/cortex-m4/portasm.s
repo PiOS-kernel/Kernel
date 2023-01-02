@@ -16,6 +16,7 @@
     .ref TICKS_COUNTER
     .ref IRQ_CTRL_REGISTER
     .ref schedule
+    .ref TASK_TIME_UNITS
 
 constkcreate_task:        		.word kcreate_task
 constkexit:        				.word kexit
@@ -24,6 +25,7 @@ constRUNNING:        			.word RUNNING
 constIRQ_CTRL_REGISTER:        	.word IRQ_CTRL_REGISTER
 constPEND_SV_BIT:        		.word PEND_SV_BIT
 constTICKS_COUNTER:        		.word TICKS_COUNTER
+constTASK_TIME_UNITS:        	.word TASK_TIME_UNITS
 ; ----------------------------------------------------------- 
 SVCallISR: .asmfunc
 
@@ -143,9 +145,11 @@ SysTick_Handler: .asmfunc
     add r1, r1, #1 
     str r1, [r0] 
 
-    ; If the ticks counter has reached the value of 10 (10ms is the time 
+    ; If the ticks counter has reached the value of TASK_TIME_UNITS (10ms is the default time 
     ; quantum), the task switch is performed 
-    cmp r1, #10 
+    ldr r2, constTASK_TIME_UNITS
+    ldr r2, [r2]
+    cmp r1, r2
     bne end_of_isr 
 
     ; The ticks counter is reset 

@@ -30,9 +30,9 @@ typedef struct SysTick {
     uint32_t CALIB __attribute__((aligned(4)));
 } SysTick;
 
-/* Number of time units dedicated to a single task, before interrupting it */
+/* Number of time units (in milliseconds) dedicated to a single task, before interrupting it */
 
-#define TASK_TIME_UNITS 10
+const uint32_t TASK_TIME_UNITS = 1;
 
 static const uint32_t MASK24 = 0x00FFFFFF;
 
