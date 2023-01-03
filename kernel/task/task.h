@@ -32,7 +32,6 @@ typedef struct Queue
 }Queue;
 
 //prioriy queues
-extern Queue WAITING_QUEUES[MIN_PRIORITY];
 extern Queue READY_QUEUES[MIN_PRIORITY];
 
 // Task Control Block function prototypes
