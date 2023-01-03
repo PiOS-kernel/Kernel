@@ -6,7 +6,7 @@
 MCB* mutex_init() {
     MCB* mcb = (MCB*) alloc(sizeof(MCB));
     mcb->lock = 0;
-    mcb->owners = NULL;
+    mcb->owners = 0; // null
     mcb->type = MUTEX;
     return mcb;
 }
@@ -18,10 +18,10 @@ MCB* semaphore_init(uint32_t c){
     if(c < 1){ return NULL; }
     if(c == 1){
         mcb->type = SEMAPHORE_BIN;
-        mcb->owners = NULL;
+        mcb->owners = 0; // null
     } else{
         mcb->type = SEMAPHORE_INT;
-        
+        mcb->owners = (uint32_t) dynamicList_init(MAX_SIZE_WAITING);
     }
     return mcb;
 }
@@ -102,21 +102,20 @@ void synch_post(MCB* lock){
 
 /* Dynamic List Implementation */
 /**
- * @brief dynamic list initialization
- * 
- * @param list the dynamicList_t variable must be statically allocated before calling this function
- *        the dynamicList_t variable must be passed by reference
- * @param item_size item size in bytes
+ * @brief inizialized a dynamic list of 32-bit items
+
  * @param size dimension of the list
  */
-void dynamicList_init(dynamicList_t* list, uint8_t size){
-    list->base = (uint32_t) alloc(sizeof(uint32_t) * size);
+dynamicList_t* dynamicList_init(uint8_t size){
+    dynamicList_t* list = (dynamicList_t*) alloc(sizeof(dynamicList_t) + sizeof(uint32_t) * size);
+    list->base = (uint32_t) list + sizeof(dynamicList_t);
     list->size = size;
-    uint32_t address;// = (uint32_t*) list->base;
+    uint32_t address;
     for(int i = 0; i < list->size; i++){
         address = list->base + i * sizeof(uint32_t);
             *(uint32_t*)address = 0;
     }
+    return list;
 }
 
 /**

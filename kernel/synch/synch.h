@@ -20,7 +20,7 @@ typedef struct{
 
 typedef struct MCB{
     uint32_t lock;
-    void* owners; // pointer to an owner or a list of owners
+    uint32_t owners; // holds the address of the owner or a list of owners
     Lock_t type;
     uint32_t count;
 } MCB;
@@ -31,7 +31,7 @@ void synch_wait(MCB* lock);
 void synch_post(MCB* lock);
 
 // dynamic list utilities
-void dynamicList_init(dynamicList_t* list, uint8_t size);
+dynamicList_t* dynamicList_init(uint8_t size);
 uint8_t dynamicList_add(dynamicList_t* list, uint32_t item);
 uint8_t dynamicList_remove(dynamicList_t* list, uint32_t item);
 uint32_t* dynamicList_search(dynamicList_t* list, uint32_t item);
