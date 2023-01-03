@@ -2,10 +2,11 @@
 #include "../heap/malloc.h"
 #include "../exceptions.h"
 
+
 MCB* mutex_init() {
     MCB* mcb = (MCB*) alloc(sizeof(MCB));
     mcb->lock = 0;
-    mcb->owner = NULL;
+    mcb->owners = NULL;
     mcb->type = MUTEX;
     return mcb;
 }
@@ -13,14 +14,15 @@ MCB* mutex_init() {
 MCB* semaphore_init(uint32_t c){
     MCB* mcb = (MCB*) alloc(sizeof(MCB));
     mcb->lock = 0;
-    mcb->owner = NULL;
+    mcb->count = c;
     if(c < 1){ return NULL; }
     if(c == 1){
         mcb->type = SEMAPHORE_BIN;
+        mcb->owners = NULL;
     } else{
         mcb->type = SEMAPHORE_INT;
+        
     }
-    mcb->count = c;
     return mcb;
 }
 
@@ -28,7 +30,7 @@ uint8_t mutex_wait(MCB* lock){
     disable_interrupts();
     if(lock->lock == 0){
         lock->lock = 1;
-        lock->owner = RUNNING;
+        lock->owners = RUNNING;
         enable_interrupts();
         return 1;
     } else{
@@ -39,9 +41,9 @@ uint8_t mutex_wait(MCB* lock){
 
 uint8_t mutex_post(MCB* lock){
     disable_interrupts();
-    if(lock->lock == 1 && lock->owner == RUNNING){
+    if(lock->lock == 1 && lock->owners == RUNNING){
         lock->lock = 0;
-        lock->owner = NULL;
+        lock->owners = NULL;
         enable_interrupts();
         return 1;
     }
@@ -93,4 +95,79 @@ void synch_post(MCB* lock){
     } else {
         sem_post(lock);
     }
+}
+
+
+/* -------------------------- */
+
+/* Dynamic List Implementation */
+/**
+ * @brief dynamic list initialization
+ * 
+ * @param list the dynamicList_t variable must be statically allocated before calling this function
+ *        the dynamicList_t variable must be passed by reference
+ * @param item_size item size in bytes
+ * @param size dimension of the list
+ */
+void dynamicList_init(dynamicList_t* list, uint8_t size){
+    list->base = (uint32_t) alloc(sizeof(uint32_t) * size);
+    list->size = size;
+}
+
+/**
+ * @brief add an item to the list
+ * 
+ * @param list 
+ * @param item 
+ * @return uint8_t 
+ */
+uint8_t dynamicList_add(dynamicList_t* list, uint32_t item){
+    void* address = (void*) list->base;
+    for(int i = 0; i < list->size; i++){
+        address = address + i * sizeof(uint32_t);
+        if(*(uint32_t*)address == NULL){
+            *(uint32_t*)address = item;
+            return 1;
+        }
+    }
+    // list is full
+    return 0;
+}
+
+/**
+ * @brief remove an item from the list
+ * 
+ * @param list 
+ * @param item 
+ * @return uint8_t 
+ */
+uint8_t dynamicList_remove(dynamicList_t* list, uint32_t item){
+    void* address = (void*) list->base;
+    for(int i = 0; i < list->size; i++){
+        address = address + i * sizeof(uint32_t);
+        if(*(uint32_t*)address == item){
+            *(uint32_t*)address = NULL;
+            return 1;
+        }
+    }
+    // item not found
+    return 0;
+}
+
+/**
+ * @brief search a specific item
+ * 
+ * @param list 
+ * @return uint32_t 
+ */
+uint32_t* dynamicList_search(dynamicList_t* list, uint32_t item){
+    void* address = (void*) list->base;
+    for(int i = 0; i < list->size; i++){
+        address = address + i * sizeof(uint32_t);
+        if(*(uint32_t*)address == item){
+            return (uint32_t*)address;
+        }
+    }
+    // item not found
+    return NULL;
 }
