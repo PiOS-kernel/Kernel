@@ -112,21 +112,26 @@ void synch_post(MCB* lock){
 void dynamicList_init(dynamicList_t* list, uint8_t size){
     list->base = (uint32_t) alloc(sizeof(uint32_t) * size);
     list->size = size;
+    uint32_t address;// = (uint32_t*) list->base;
+    for(int i = 0; i < list->size; i++){
+        address = list->base + i * sizeof(uint32_t);
+            *(uint32_t*)address = 0;
+    }
 }
 
 /**
- * @brief add an item to the list
+ * @brief add an item to the list. This function does NOT check overflows
  * 
  * @param list 
  * @param item 
- * @return uint8_t 
+ * @return uint8_t
  */
 uint8_t dynamicList_add(dynamicList_t* list, uint32_t item){
-    void* address = (void*) list->base;
+    uint32_t address;
     for(int i = 0; i < list->size; i++){
-        address = address + i * sizeof(uint32_t);
-        if(*(uint32_t*)address == NULL){
-            *(uint32_t*)address = item;
+        address = list->base + i * sizeof(uint32_t);
+        if(*(uint32_t*)address == 0){
+            *(uint32_t*)address = (uint32_t) item;
             return 1;
         }
     }
@@ -135,18 +140,18 @@ uint8_t dynamicList_add(dynamicList_t* list, uint32_t item){
 }
 
 /**
- * @brief remove an item from the list
+ * @brief remove the first occurrence founded in the list
  * 
  * @param list 
  * @param item 
  * @return uint8_t 
  */
 uint8_t dynamicList_remove(dynamicList_t* list, uint32_t item){
-    void* address = (void*) list->base;
+    uint32_t address;
     for(int i = 0; i < list->size; i++){
-        address = address + i * sizeof(uint32_t);
+        address = list->base + i * sizeof(uint32_t);
         if(*(uint32_t*)address == item){
-            *(uint32_t*)address = NULL;
+            *(uint32_t*)address = 0;
             return 1;
         }
     }
@@ -161,9 +166,9 @@ uint8_t dynamicList_remove(dynamicList_t* list, uint32_t item){
  * @return uint32_t 
  */
 uint32_t* dynamicList_search(dynamicList_t* list, uint32_t item){
-    void* address = (void*) list->base;
+    uint32_t address;
     for(int i = 0; i < list->size; i++){
-        address = address + i * sizeof(uint32_t);
+        address = list->base + i * sizeof(uint32_t);
         if(*(uint32_t*)address == item){
             return (uint32_t*)address;
         }
