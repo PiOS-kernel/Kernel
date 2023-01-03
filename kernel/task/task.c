@@ -7,6 +7,7 @@ void TaskTCB_init(TaskTCB* tcb, uint8_t p)
 {
     tcb->priority = p;
     tcb->next = NULL;
+    tcb->prev = NULL;
     // The stack pointer is initialized to the end address of the task's stack
     tcb->stp = (uint8_t*) (tcb->stack + STACK_SIZE);
 }
@@ -36,6 +37,21 @@ void stack_push(TaskTCB * task, uint8_t* src, int size)
     }
 }
 
+// Function to unlink a task from the linked list it belongs to
+void unlink_task(TaskTCB *task)
+{
+    if (task->prev != NULL)
+    {
+        task->prev->next = task->next;
+    }
+    if (task->next != NULL)
+    {
+        task->next->prev = task->prev;
+    }
+    task->next = NULL;
+    task->prev = NULL;
+}
+
 // initialize the queue with both head and tail NULL
 void Queue_init(Queue* q)
 {
@@ -62,7 +78,9 @@ void enqueue (Queue* q, TaskTCB *task)
     {
         // if it is not empty enqueue the element as the last elemnt
         q->tail->next = task;
-        q->tail = q->tail->next; // update the tail to the new end of the queue
+        task->prev = q->tail;
+        task->next = NULL;
+        q->tail = task; // update the tail to the new end of the queue
     }
 }
 
@@ -75,6 +93,7 @@ TaskTCB* dequeue (Queue* q){
         {
             // shift the head to the following element in the queue 
             q->head = old_head->next;
+            q->head->prev = NULL;
             old_head->next = NULL;
         }
         else

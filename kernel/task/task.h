@@ -21,7 +21,8 @@ typedef struct TaskTCB
     uint8_t priority;                   // priority of the task
     uint8_t _word_alignment_filling[3]; // padding to align the next field on a 4-byte boundary
     uint8_t stack[STACK_SIZE];          // stack associated to the task
-    struct TaskTCB* next;           // reference to the next Task_TCB
+    struct TaskTCB* next;               // reference to the next Task_TCB in the list
+    struct TaskTCB* prev;               // reference to the previous Task_TCB in the list
 } TaskTCB;
 
 typedef struct Queue
@@ -39,6 +40,7 @@ void TaskTCB_init(TaskTCB* tcb, uint8_t p);
 uint8_t* stack_start(TaskTCB *task);
 uint8_t* stack_end(TaskTCB *task);
 void stack_push(TaskTCB * task, uint8_t* src, int size);
+void unlink_task(TaskTCB *task);
 
 // Queue function prototypes
 void Queue_init(Queue* q);
