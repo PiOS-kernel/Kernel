@@ -16,6 +16,7 @@ extern bool test_trim_segment();
 extern bool test_queue_empty();
 extern bool test_enqueue();
 extern bool test_dequeue();
+extern bool test_unlink_task();
 extern bool test_stack_push();
 extern bool test_stack_start();
 extern bool test_stack_end();
@@ -44,6 +45,7 @@ Test all_tests[] = {
     { "test_queue_empty", test_queue_empty },
     { "test_enqueue", test_enqueue },
     { "test_dequeue", test_dequeue },
+    { "test_unlink_task", test_unlink_task },
     { "test_stack_push", test_stack_push },
     { "test_stack_start", test_stack_start },
     { "test_stack_end", test_stack_end },
