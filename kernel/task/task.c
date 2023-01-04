@@ -6,6 +6,7 @@
 void TaskTCB_init(TaskTCB* tcb, uint8_t p)
 {
     tcb->priority = p;
+    tcb->default_priority = p;
     tcb->next = NULL;
     tcb->prev = NULL;
     // The stack pointer is initialized to the end address of the task's stack
