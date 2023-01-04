@@ -134,3 +134,15 @@ void unknownService(void) {
         }
     }
 }
+/*
+This is the system call used to make the current running task 
+to yield the cpu and reset the sceduling alghoritm
+*/
+
+void yield() {
+    // SysTick counter is reset.
+    SysTick_reset();
+    
+    // The scheduler is invoked.
+    PendSVTrigger();
+}
