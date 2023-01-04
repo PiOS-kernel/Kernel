@@ -20,9 +20,12 @@ typedef struct{
 
 typedef struct MCB{
     uint32_t lock;
-    uint32_t owners; // holds the address of the owner or a list of owners
+    dynamicList_t* owners; // holds the address of the owner or a list of owners
+    uint8_t max_priority_owners;
     Lock_t type;
     uint32_t count;
+    Queue waiting[MAX_SIZE_WAITING]; // vector of priority queues
+    uint8_t max_priority_waiting;
 } MCB;
 
 MCB* mutex_init();
@@ -35,6 +38,10 @@ dynamicList_t* dynamicList_init(uint8_t size);
 uint8_t dynamicList_add(dynamicList_t* list, uint32_t item);
 uint8_t dynamicList_remove(dynamicList_t* list, uint32_t item);
 uint32_t* dynamicList_search(dynamicList_t* list, uint32_t item);
+
+void priority_inheritance(MCB* mcb);
+void update_max_priority(Queue* vector, uint8_t* value);
+TaskTCB* dynamicList_searchPriotiy(dynamicList_t* list, uint32_t p);
 
 extern void enable_interrupts(void);
 extern void disable_interrupts(void);
