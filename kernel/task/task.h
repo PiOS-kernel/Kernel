@@ -9,6 +9,7 @@
 #define STACK_SIZE 4096
 #define MIN_PRIORITY 10         //low values of prioriry represent the higher priority
 extern struct TaskTCB *RUNNING;
+extern uint32_t SHOULD_WAIT; 
 
 // Definition of the Task Control Block.
 // The struct's fields are stored in the order they appear in the definition:

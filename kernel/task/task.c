@@ -147,8 +147,9 @@ TaskTCB* schedule()
 
     // If there was a running task, and the scheduler has selected
     // a new task to be executed, the previously running task is
-    // inserted back in the ready queue
-    if (RUNNING != NULL && selected != NULL) 
+    // inserted back in the ready queue. Also, if the task wishes to enter
+    // the WAIT state, it is not inserted back in the ready queue.
+    if (RUNNING != NULL && selected != NULL && !SHOULD_WAIT) 
         enqueue(&READY_QUEUES[RUNNING->priority], RUNNING);
     
     if (selected != NULL) {
