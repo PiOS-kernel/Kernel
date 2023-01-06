@@ -55,6 +55,23 @@ def is_label(tokens):
     return len(tokens) >= 1 and is_string_literal(tokens[0][:-1]) and tokens[0][-1] == ':'
 
 
+# General purpose registers labels are either of the form: 'r' + 'register_number' or
+# one of ['sp', 'lr', 'pc']
+
+def is_general_purpose_register(s):
+    if len(s) != 2:
+        return False
+    
+    if s[0] == 'r':
+        try:
+            reg_idx = int(s[1:])
+            return reg_idx >= 0 and reg_idx <= 15
+        except ValueError:
+            return False
+    else:
+        return s == 'sp' or s == 'lr' or s == 'pc'
+
+
 # Base class for the transpilers
 
 class Transpiler:
@@ -221,17 +238,20 @@ class GCCtoCCSTranspiler(Transpiler):
         super().__init__(filename)
         self.global_symbols = []
         self.external_references = []
+        self.external_references_set = set()
         self.external_mappings = []
 
     # Adds an external reference to the dedicated sections in the header
 
     def add_external_reference(self, name):
-        # .ref <var_name>
-        self.external_references.append("    .ref " + name + "\n")
+        if name not in self.external_references_set:
+            # .ref <var_name>
+            self.external_references.append("    .ref " + name + "\n")
 
-        # const<var_name>:         .word <var_name>
-        s = "const" + name + ":        .word " + name + "\n"
-        self.external_mappings.append(s)
+            # const<var_name>:         .word <var_name>
+            s = "const" + name + ":        .word " + name + "\n"
+            self.external_mappings.append(s)
+            self.external_references_set.add(name)
 
         return "const" + name
 
@@ -259,14 +279,19 @@ class GCCtoCCSTranspiler(Transpiler):
             curr_line = self.next_line()
 
     def parse_instruction(self, tokens):
-        # Translates instructions loading variables into registers, and add the
-        # necessary constant declarations at the beginning of the file.
-        # Also translates comments
-        for i in range(len(tokens)):
-            if tokens[i][0] == "=":
-                tokens[i] = self.add_external_reference(tokens[i][1:])
-            elif tokens[i][0] == "@":
-                tokens[i] = ";" + tokens[i][1:]
+        # adds external references to the header when function calls are
+        # encountered
+        if tokens[0] in ["bl", "blx"] and not is_general_purpose_register(tokens[1]):
+            print(tokens)
+            self.external_references.append("    .ref " + tokens[1] + "\n")
+        # Translates instructions loading variables into 
+        # registers and translates comments
+        else:
+            for i in range(len(tokens)):
+                if tokens[i][0] == "=":
+                    tokens[i] = self.add_external_reference(tokens[i][1:])
+                elif tokens[i][0] == "@":
+                    tokens[i] = ";" + tokens[i][1:]
 
         str_builder = "    "
         for token in tokens:
