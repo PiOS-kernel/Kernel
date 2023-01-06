@@ -1,6 +1,10 @@
 #ifndef __EXCEPTIONS_H__
 #define __EXCEPTIONS_H__
 
+// This macro allows to trigger the PendSV handler from an ISR
+// whitout invoking the SVC handler.
+#define YIELD_FROM_ISR()
+
 /**
  * @brief SysTick module initialization
  *      set CTRL to default values
