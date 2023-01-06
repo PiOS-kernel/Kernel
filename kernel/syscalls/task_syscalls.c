@@ -41,6 +41,13 @@ of the current task.
 extern void exit();
 
 /*
+This is the system call provided to the user application to make the current running task 
+yield the cpu and reset the sceduling alghoritm
+*/
+
+extern void yield();
+
+/*
 
 Kernel space implementation for create_task(), brief description:
 This is the function used by the kernel to create a new task
@@ -135,11 +142,10 @@ void unknownService(void) {
     }
 }
 /*
-This is the system call used to make the current running task 
-to yield the cpu and reset the sceduling alghoritm
+This is the kernel implementation of the yield function
 */
 
-void yield() {
+void kyield() {
     // SysTick counter is reset.
     SysTick_reset();
     

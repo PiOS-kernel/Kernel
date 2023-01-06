@@ -22,6 +22,11 @@ SVCallISR:
     ldreq r5, =kexit
     beq _callService
 
+    cmp r4, #0x3
+    itt eq
+    ldreq r5, =kyield
+    beq _callService
+
     @ No service corresponding to the SVC number is found
     ldr r5, =unknownService
 
@@ -118,6 +123,15 @@ create_task:
 .global exit
 exit:
     svc #2
+    mov pc, lr
+
+@ -----------------------------------------------------------
+
+@ The system call that allows a task to yield the cpu 
+.thumb_func
+.global yield
+yield:
+    svc #3
     mov pc, lr
 
 @ -----------------------------------------------------------
