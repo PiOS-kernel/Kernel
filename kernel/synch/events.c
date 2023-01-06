@@ -39,16 +39,15 @@ void event_wait(EventHandle event) {
     Event* e = (Event*) event;
 
     // INTERRUPTS MUST BE DISABLED. Transactions to the shared waiting
-    // queue must be atomic. Also the updating of the RUNNING pointer
-    // must occur in the same atomic transaction.
+    // queue must be atomic.
     disable_interrupts();
 
     // The task is enqueued
     enqueue(&e->waiting_queue, RUNNING);
 
-    // The RUNNING pointer is set to NULL, in order to prevent the scheduler
-    // from inserting the running task in the READY queue.
-    RUNNING = NULL;
+    // Tells the scheduler that the task should not be inserted back in
+    // the ready queue
+    SHOULD_WAIT = 1;
 
     // Interrupts are enabled again
     enable_interrupts();
