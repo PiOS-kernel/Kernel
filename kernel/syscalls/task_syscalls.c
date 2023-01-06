@@ -34,6 +34,13 @@ be set to 0.
 const uint32_t INITIAL_XPSR = 0x01000000;
 
 /*
+This is the system call provided to the user application to make the current running task 
+yield the cpu and reset the sceduling alghoritm
+*/
+
+extern void yield();
+
+/*
 
 Kernel space implementation for create_task(), brief description:
 This is the function used by the kernel to create a new task
@@ -121,4 +128,15 @@ void unknownService(void) {
             // busy waiting
         }
     }
+}
+/*
+This is the kernel implementation of the yield function
+*/
+
+void kyield() {
+    // SysTick counter is reset.
+    SysTick_reset();
+    
+    // The scheduler is invoked.
+    PendSVTrigger();
 }
