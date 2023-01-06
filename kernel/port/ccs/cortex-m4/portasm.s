@@ -5,25 +5,28 @@
     .global SysTick_Handler
     .global create_task
     .global exit
+    .global yield
     .global enable_interrupts
     .global disable_interrupts
     .global PendSVTrigger
     .ref kcreate_task
     .ref kexit
+    .ref kyield
     .ref unknownService
     .ref RUNNING
+    .ref schedule
+    .ref IRQ_CTRL_REGISTER
     .ref PEND_SV_BIT
     .ref TICKS_COUNTER
-    .ref IRQ_CTRL_REGISTER
-    .ref schedule
 
-constkcreate_task:        		.word kcreate_task
-constkexit:        				.word kexit
-constunknownService:        	.word unknownService
-constRUNNING:        			.word RUNNING
-constIRQ_CTRL_REGISTER:        	.word IRQ_CTRL_REGISTER
-constPEND_SV_BIT:        		.word PEND_SV_BIT
-constTICKS_COUNTER:        		.word TICKS_COUNTER
+constkcreate_task:          .word kcreate_task
+constkexit:                 .word kexit
+constkyield:                .word kyield
+constunknownService:        .word unknownService
+constRUNNING:               .word RUNNING
+constIRQ_CTRL_REGISTER:     .word IRQ_CTRL_REGISTER
+constPEND_SV_BIT:           .word PEND_SV_BIT
+constTICKS_COUNTER:         .word TICKS_COUNTER
 ; ----------------------------------------------------------- 
 SVCallISR: .asmfunc
 
@@ -39,6 +42,10 @@ SVCallISR: .asmfunc
     cmp r4, #0x2 
     itt eq 
     ldreq r5, constkexit 
+    beq _callService 
+    cmp r4, #0x3 
+    itt eq 
+    ldreq r5, constkyield 
     beq _callService 
 
     ; No service corresponding to the SVC number is found 
@@ -177,6 +184,15 @@ create_task: .asmfunc
 ; The system call that allows a task to terminate itself 
 exit: .asmfunc
     svc #2 
+    mov pc, lr 
+
+    .endasmfunc
+
+
+; ----------------------------------------------------------- 
+; The system call that allows a task to yield the cpu 
+yield: .asmfunc
+    svc #3 
     mov pc, lr 
 
     .endasmfunc
