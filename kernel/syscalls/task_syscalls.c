@@ -6,24 +6,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/* 
-When a task is created its stack is initialized to resemble what it would
-look like if the task was interrupted by an interrupt handler. This is
-the value for exception return.
-WE WILL NEED TO CHANGE THIS VALUE ONCE WE USE 'MSP' and 'PSP'.
-*/
-#define INITIAL_EXEC_RETURN 0xFFFFFFF9
-
-/* 
-On exit from an exception or interrupt handler, when the cortex m4 processor
-is running in thumb mode it expects bit[0] of the next instruction to execute to
-be set to 0.
-*/
-#define PC_MASK 0xFFFFFFFE
-
-/* This is the initial value for the XPSR register of a newly created task. */
-const uint32_t INITIAL_XPSR = 0x01000000;
-
 /*
 This is the system call provided to the user application, in order to
 create a new task.
@@ -39,6 +21,17 @@ of the current task.
 */
 
 extern void exit();
+
+/* 
+On exit from an exception or interrupt handler, when the cortex m4 processor
+is running in thumb mode it expects bit[0] of the next instruction to execute to
+be set to 0.
+*/
+
+#define PC_MASK 0xFFFFFFFE
+
+/* This is the initial value for the XPSR register of a newly created task. */
+const uint32_t INITIAL_XPSR = 0x01000000;
 
 /*
 This is the system call provided to the user application to make the current running task 
@@ -72,7 +65,6 @@ Registers layout for the cortex-M4 processor:
     r14 link register
     r15 program counter
 
-Task initialization:
 The initialization of a new task's stack is done by mimicking the
 image of the stack when program execution is interruped by an 
 interrupt handler.
@@ -102,10 +94,6 @@ void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
     // has a non-zero value, which is the pointer to the arguments.
     stack_push(tcb, (uint8_t*) zeros, sizeof(uint32_t) * 4);
     stack_push(tcb, (uint8_t*) &args, sizeof(void *));
-
-    // Now the execution return value from the ISR is pushed onto the stack.
-    tcb->stp -= 4;
-    *((uint32_t*) tcb->stp) = INITIAL_EXEC_RETURN;
 
     // Finally, registers r4 through r11 are pushed onto the stack and
     // 0-initialized.

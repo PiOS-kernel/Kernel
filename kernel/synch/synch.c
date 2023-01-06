@@ -2,14 +2,28 @@
 #include "../heap/malloc.h"
 #include "../exceptions.h"
 
-MCB* mutex_init(void) {
+MCB* mutex_init() {
     MCB* mcb = (MCB*) alloc(sizeof(MCB));
     mcb->lock = 0;
     mcb->owner = NULL;
+    mcb->type = MUTEX;
     return mcb;
 }
 
-uint8_t MCB_wait(MCB* lock){
+MCB* semaphore_init(uint32_t c){
+    MCB* mcb = (MCB*) alloc(sizeof(MCB));
+    mcb->lock = 0;
+    mcb->owner = NULL;
+    if(c == 1){
+        mcb->type = SEMAPHORE_BIN;
+    } else{
+        mcb->type = SEMAPHORE_INT;
+    }
+    mcb->count = c;
+    return mcb;
+}
+
+uint8_t mutex_wait(MCB* lock){
     disable_interrupts();
     if(lock->lock == 0){
         lock->lock = 1;
@@ -22,7 +36,7 @@ uint8_t MCB_wait(MCB* lock){
     }
 }
 
-uint8_t MCB_post(MCB* lock){
+uint8_t mutex_post(MCB* lock){
     disable_interrupts();
     if(lock->lock == 1 && lock->owner == RUNNING){
         lock->lock = 0;
@@ -34,14 +48,44 @@ uint8_t MCB_post(MCB* lock){
     return 0;
 }
 
-void mutex_wait(MCB* lock){
-    while(!MCB_wait(lock)){
-        // priority inheritance ?
-        // call context switch
-        PendSVTrigger();
-    };
+uint8_t sem_wait(MCB* lock){
+    disable_interrupts();
+    if(lock->lock == 0){
+        lock->lock += 1;
+        enable_interrupts();
+        return 1;
+    } else{
+        enable_interrupts();
+        return 0;
+    }
 }
 
-void mutex_post(MCB* lock){
-    MCB_post(lock);
+uint8_t sem_post(MCB* lock){
+    disable_interrupts();
+    if(lock->lock > 0){
+        lock->lock -= 1;
+        enable_interrupts();
+        return 1;
+    }
+    enable_interrupts();
+    return 0;
+}
+
+void synch_wait(MCB* lock){
+    if(lock->type == MUTEX){
+        while(!mutex_wait(lock));
+    } else {
+        while(!sem_wait(lock));
+    }
+    // priority inheritance ?
+    // call context switch
+    PendSVTrigger();
+}
+
+void synch_post(MCB* lock){
+    if(lock->type == MUTEX){
+        mutex_post(lock);
+    } else {
+        sem_post(lock);
+    }
 }

@@ -202,7 +202,7 @@ class CCStoGCCTranspiler(Transpiler):
 
     def transpile(self):
         # Write the header
-        self.write_line(".cpu cortex-m4")
+        self.write_line(".cpu cortex-m3")
         self.write_line(".thumb")
         self.write_line(".syntax unified\n")
         self.write_line("@ -----------------------------------------------------------\n")
@@ -221,17 +221,20 @@ class GCCtoCCSTranspiler(Transpiler):
         super().__init__(filename)
         self.global_symbols = []
         self.external_references = []
+        self.external_references_set = set()
         self.external_mappings = []
 
     # Adds an external reference to the dedicated sections in the header
 
     def add_external_reference(self, name):
-        # .ref <var_name>
-        self.external_references.append("    .ref " + name + "\n")
+        if name not in self.external_references_set:
+            # .ref <var_name>
+            self.external_references.append("    .ref " + name + "\n")
 
-        # const<var_name>:         .word <var_name>
-        s = "const" + name + ":        .word " + name + "\n"
-        self.external_mappings.append(s)
+            # const<var_name>:         .word <var_name>
+            s = "const" + name + ":        .word " + name + "\n"
+            self.external_mappings.append(s)
+            self.external_references_set.add(name)
 
         return "const" + name
 
