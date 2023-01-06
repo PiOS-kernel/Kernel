@@ -12,6 +12,40 @@ bool test_heap_init() {
     return true;
 }
 
+bool test_heap_alignment() {
+    uint8_t heap_mem[1024];
+    Heap heap = new_heap();
+    heap_init(&heap, (uint8_t*) heap_mem, 1024);
+    
+    for (int i=0; i<10; ++i) {
+        bool* ptr = (bool*) alloc(sizeof(bool));
+        ASSERT(((uint32_t) ptr) % 4 == 0);
+    }
+    return true;
+}
+
+bool test_heap_alignment1() {
+    uint8_t heap_mem[1024];
+
+    // The heap start address is not word-aligned
+    if ( ((uint32_t) heap_mem) % 4 != 0 ) {
+        Heap heap = new_heap();
+        heap_init(&heap, (uint8_t*) heap_mem, 512);
+
+        ASSERT(heap.head->size != 1024);
+        ASSERT(((uint32_t) &(heap.head)) % 4 == 0);
+    } 
+    // The heap is word-aligned
+    else {
+        Heap heap = new_heap();
+        heap_init(&heap, (uint8_t*) heap_mem + 1, 512);
+
+        ASSERT(heap.head->size != 1024);
+        ASSERT(((uint32_t) &(heap.head)) % 4 == 0);
+    }
+    return true;
+}
+
 bool test_count_segments() {
     uint8_t heap_mem[1024];
     Heap heap = new_heap();
