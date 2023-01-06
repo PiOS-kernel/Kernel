@@ -96,6 +96,7 @@ void synch_wait(MCB* lock){
     if(!result){
         // task failed to acquire the lock
         enqueue(&(lock->waiting[RUNNING->priority]), RUNNING);
+        SHOULD_WAIT = 1;
         update_max_priority(lock->waiting, &(lock->max_priority_waiting));
         priority_inheritance(lock);
         enable_interrupts();
