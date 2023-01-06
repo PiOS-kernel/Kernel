@@ -10,7 +10,7 @@
 */
 
 EventHandle new_event(uint32_t msg_size) {
-    Event* event = alloc(sizeof(Event) + msg_size);
+    Event* event = (Event*) alloc(sizeof(Event) + msg_size);
 
     // There is no handling of allocation failure because if no memory
     // is available, the system cannot be recovered to a valid state.
