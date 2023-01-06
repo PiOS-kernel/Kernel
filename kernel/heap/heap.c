@@ -9,7 +9,12 @@ const Heap new_heap() {
 /* Initializes the heap as a single empty memory block */
 
 void heap_init(Heap *heap, uint8_t* start_address, size_t size) {
-    add_free_segment(heap, start_address, size);
+    // The heap is aligned to a 4-byte boundary
+    uint8_t* heap_start = (uint8_t*) (((uint32_t) start_address + 3) & ~0x3);
+    size = size - ((uint32_t) heap_start - (uint32_t) start_address);
+
+    // The heap is initialized as a single free segment
+    add_free_segment(heap, heap_start, size);
 }
 
 /* 
@@ -25,6 +30,8 @@ uint8_t* allocate_segment(Heap *heap, size_t size) {
 
     // The heap never allocates segments smaller than SEGMENT_HEADER_SIZE
     size_t actual_size = (size > SEGMENT_HEADER_SIZE) ? size : SEGMENT_HEADER_SIZE;
+    // Also, the heap always allocates segments that are a multiple of 4 bytes
+    actual_size = (actual_size + 3) & ~0x3;
 
     // Check the head first
     if (heap->head->size >= actual_size) {
