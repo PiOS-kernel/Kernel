@@ -92,5 +92,5 @@ void event_post(EventHandle event, void* msg_ptr) {
 
 void get_event_msg(EventHandle event, void* dst) {
     Event* e = (Event*) event;
-    memcpy((uint8_t*) dst, (uint8_t*) e->msg_ptr, e->msg_size);
+    memcpy((uint8_t*) e->msg_ptr, (uint8_t*) dst, e->msg_size);
 }
