@@ -2,10 +2,11 @@
 #include "../kernel.h"
 #include "../utils/utils.h"
 
-/* 
-@brief: creates an event object and returns an handle.
+/** 
+ * @brief: creates an event object and returns an handle.
 
-@param: msg_size - the size of the message.
+ * @param: msg_size - the size of the message.
+ * @return: an handle to the event object.
 */
 
 EventHandle new_event(uint32_t msg_size) {
@@ -27,11 +28,11 @@ EventHandle new_event(uint32_t msg_size) {
     return (EventHandle) event;
 }
 
-/*
-@brief: the task is enqueued in the event waiting queue. All tasks in that
-queue will be woken up when the event is signaled.
+/**
+ * @brief: the task is enqueued in the event waiting queue. All tasks in the 
+ * queue will be woken up when the event is signaled.
 
-@param: event - the event handle
+ * @param: event - the event handle
 */
 
 void event_wait(EventHandle event) {
@@ -56,10 +57,11 @@ void event_wait(EventHandle event) {
     PendSVTrigger(); // Should be a call to yield()
 }
 
-/*
-@brief: the event is signaled and all tasks in the waiting queue are woken up.
+/**
+ * @brief: the event is signaled and all tasks in the waiting queue are woken up.
 
-@param: event - the event handle
+ * @param: event - the event handle
+ * @param: msg_ptr - the message that comes with the event
 */
 
 void event_post(EventHandle event, void* msg_ptr) {
@@ -81,11 +83,11 @@ void event_post(EventHandle event, void* msg_ptr) {
     enable_interrupts();
 }
 
-/*
-@brief: the event message is copied to the destination buffer.
+/**
+ * @brief: the event message is copied to the destination buffer.
 
-@param: event - the event handle
-@param: dst - the destination buffer
+ * @param: event - the event handle
+ * @param: dst - the destination buffer
 */
 
 void get_event_msg(EventHandle event, void* dst) {
