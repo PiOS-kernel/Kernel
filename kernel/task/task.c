@@ -152,6 +152,9 @@ TaskTCB* schedule()
     if (RUNNING != NULL && selected != NULL && !SHOULD_WAIT) 
         enqueue(&READY_QUEUES[RUNNING->priority], RUNNING);
     
+    // Set the SHOULD_WAIT flag to false
+    SHOULD_WAIT = 0;
+
     if (selected != NULL) {
         RUNNING = selected; // set the selected task as the running task
         return selected;
