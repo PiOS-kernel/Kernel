@@ -93,3 +93,15 @@ void get_event_msg(EventHandle event, void* dst) {
     Event* e = (Event*) event;
     memcpy((uint8_t*) e->msg_ptr, (uint8_t*) dst, e->msg_size);
 }
+
+/**
+ * @brief: the function cleans up memory allocated for the event structures.
+
+ * @param: event - the event handle
+*/
+
+void delete_event(EventHandle event) {
+    // This function will be implemented once dynamic memory de-allocation
+    // will be fixed.
+    ;
+}

@@ -26,5 +26,6 @@ EventHandle new_event(uint32_t msg_size);
 void event_wait(EventHandle event);
 void event_post(EventHandle event, void* msg_ptr);
 void get_event_msg(EventHandle event, void* dst);
+void delete_event(EventHandle event);
 
 #endif
