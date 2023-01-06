@@ -200,7 +200,7 @@ bool test_allocate_segment1() {
     ASSERT(ptr != NULL);
     ASSERT(available_space(&HEAP) == HEAP_SIZE - SEGMENT_HEADER_SIZE);
 
-    free(ptr);
+    free(ptr, sizeof(uint8_t));
     ASSERT(available_space(&HEAP) == HEAP_SIZE);
     return true;
 }
