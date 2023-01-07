@@ -11,6 +11,8 @@ extern bool test_heap_compaction1();
 extern bool test_allocate_segment();
 extern bool test_allocate_segment1();
 extern bool test_trim_segment();
+extern bool test_heap_alignment();
+extern bool test_heap_alignment1();
 
 // Tasks tests
 extern bool test_queue_empty();
@@ -40,6 +42,8 @@ Test all_tests[] = {
     { "test_allocate_segment", test_allocate_segment },
     { "test_allocate_segment1", test_allocate_segment1 },
     { "test_trim_segment", test_trim_segment },
+    { "test_heap_alignment", test_heap_alignment },
+    { "test_heap_alignment1", test_heap_alignment1 },
 
     // Tasks tests
     { "test_queue_empty", test_queue_empty },
