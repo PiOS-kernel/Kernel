@@ -95,13 +95,14 @@ void get_event_msg(EventHandle event, void* dst) {
 }
 
 /**
- * @brief: the function cleans up memory allocated for the event structures.
+ * @brief: the function reclaims memory allocated for the event structures.
 
  * @param: event - the event handle
 */
 
 void delete_event(EventHandle event) {
-    // This function will be implemented once dynamic memory de-allocation
-    // will be fixed.
-    ;
+    // The message is stored just after the event object itself. It
+    // must is freed together with the event object.
+    uint32_t size = sizeof(Event) + ((Event*) event)->msg_size;
+    free((void*) event, size);
 }
