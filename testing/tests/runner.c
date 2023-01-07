@@ -32,6 +32,9 @@ extern bool test_create_task();
 extern bool test_memcpy();
 extern bool test_memset();
 
+// Synchronization primitives tests
+extern bool test_event_memory_allocation();
+
 Test all_tests[] = {
     // Heap tests
     { "test_heap_init", test_heap_init },
@@ -62,6 +65,9 @@ Test all_tests[] = {
     // Utility functions tests
     { "test_memcpy", test_memcpy },
     { "test_memset", test_memset },
+
+    // Synchronization primitives tests
+    { "test_event_memory_allocation", test_event_memory_allocation },
 };
 
 void tests_runner() {
