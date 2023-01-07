@@ -4,6 +4,7 @@
 #include "../task/task.h"
 
 
+
 MCB* mutex_init() {
     MCB* mcb = (MCB*) alloc(sizeof(MCB));
     mcb->lock = 0;
@@ -79,6 +80,7 @@ uint8_t sem_post(MCB* lock){
     if(lock->lock > 0){
         lock->lock -= 1;
         dynamicList_remove(lock->owners, (uint32_t) RUNNING);
+        update_max_ownerPriority(lock);
         enable_interrupts();
         return 1;
     }
@@ -97,7 +99,7 @@ void synch_wait(MCB* lock){
         // task failed to acquire the lock
         enqueue(&(lock->waiting[RUNNING->priority]), RUNNING);
         SHOULD_WAIT = 1;
-        update_max_priority(lock->waiting, &(lock->max_priority_waiting));
+        update_max_waitPriority(lock);
         priority_inheritance(lock);
         enable_interrupts();
         PendSVTrigger();
@@ -118,8 +120,10 @@ void synch_post(MCB* lock){
     if(lock->max_priority_waiting != -1){ // waiting is not empty
         // choose the task to add to owners
         TaskTCB* task = dequeue(&(lock->waiting[lock->max_priority_waiting]));
-        update_max_priority(lock->waiting, &(lock->max_priority_waiting));
+        enqueue(&READY_QUEUES[task->priority], task);
         dynamicList_add(lock->owners, (uint32_t) task);
+        update_max_waitPriority(lock);
+        update_max_ownerPriority(lock);
         lock->count += 1;
     }
     enable_interrupts();
@@ -211,22 +215,46 @@ uint32_t* dynamicList_search(dynamicList_t* list, uint32_t item){
  * @param vector -> it's the vector of priority queues
  * @param value -> the value to update - if the vector is empty, the value is set to -1
  */
-void update_max_priority(Queue* vector, uint8_t* value){
+void update_max_waitPriority(MCB* mcb){
+    Queue* vector = mcb->waiting;
     uint8_t i = 0;
     for (; i<MIN_PRIORITY; i++) {
         if(!empty(&(vector[i]))){
-            *value = i;
+            mcb->max_priority_waiting = i;
             return;
         }
     }
-    *value = -1;
+    // if the vector is empty, set priority to -1
+    mcb->max_priority_waiting = -1;
+}
+
+void update_max_ownerPriority(MCB* mcb){
+    dynamicList_t* list = mcb->owners;
+    TaskTCB** address;
+    uint8_t max = MIN_PRIORITY +1;
+    for(int i = 0; i < list->size; i++){
+        address = (TaskTCB**) (list->base + i * sizeof(uint32_t));
+        if((*address)->priority < max){
+            max = (*address)->priority;
+        }
+    }
+    if(max == MIN_PRIORITY +1){
+        // if the vector is empty, set priority to -1
+        mcb->max_priority_owners = -1;
+    } else {
+        mcb->max_priority_owners = max;
+    }
 }
 
 void priority_inheritance(MCB* mcb){
     if(RUNNING->priority < mcb->max_priority_owners){
         // there is at least one task with that priority
-        TaskTCB* task = dynamicList_searchPriotiy(mcb->owners, mcb->max_priority_owners);
+        TaskTCB* task = dynamicList_searchPriority(mcb->owners, mcb->max_priority_owners);
         task->priority = RUNNING->priority;
+        update_max_ownerPriority(mcb);
+        // move task to appropriate queue in READY_QUEUE
+        unlink_task(task);
+        enqueue(&(READY_QUEUES[task->priority]), task);
     }
 }
 
@@ -237,14 +265,15 @@ void priority_inheritance(MCB* mcb){
  * @param p priority
  * @return TaskTCB* 
  */
-TaskTCB* dynamicList_searchPriotiy(dynamicList_t* list, uint32_t p){
-    uint32_t address;
+TaskTCB* dynamicList_searchPriority(dynamicList_t* list, uint32_t p){
+    TaskTCB** address;
     for(int i = 0; i < list->size; i++){
-        address = list->base + i * sizeof(uint32_t);
-        if(((TaskTCB*)address)->priority == p){
-            return (TaskTCB*)address;
+        address = (TaskTCB**) (list->base + i * sizeof(uint32_t));
+        if((*address)->priority == p){
+            return *(address);
         }
     }
     // item not found
     return NULL;
 }
+

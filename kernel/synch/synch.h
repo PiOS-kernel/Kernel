@@ -16,6 +16,7 @@ typedef enum {
 typedef struct{
   uint32_t base;
   uint8_t size; // items - max 256 items - items are 32-bit words
+  uint8_t allignment[3];
 } dynamicList_t;
 
 typedef struct MCB{
@@ -24,7 +25,7 @@ typedef struct MCB{
     uint8_t max_priority_owners;
     Lock_t type;
     uint32_t count;
-    Queue waiting[MAX_SIZE_WAITING]; // vector of priority queues
+    Queue waiting[MIN_PRIORITY]; // vector of priority queues
     uint8_t max_priority_waiting;
 } MCB;
 
@@ -40,8 +41,9 @@ uint8_t dynamicList_remove(dynamicList_t* list, uint32_t item);
 uint32_t* dynamicList_search(dynamicList_t* list, uint32_t item);
 
 void priority_inheritance(MCB* mcb);
-void update_max_priority(Queue* vector, uint8_t* value);
-TaskTCB* dynamicList_searchPriotiy(dynamicList_t* list, uint32_t p);
+void update_max_waitPriority(MCB* mcb);
+void update_max_ownerPriority(MCB* mcb);
+TaskTCB* dynamicList_searchPriority(dynamicList_t* list, uint32_t p);
 
 extern void enable_interrupts(void);
 extern void disable_interrupts(void);
