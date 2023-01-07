@@ -53,7 +53,7 @@ void event_wait(EventHandle event) {
     enable_interrupts();
 
     // The scheduler is invoked
-    PendSVTrigger(); // Should be a call to yield()
+    yield();
 }
 
 /**
