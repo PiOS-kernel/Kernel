@@ -109,7 +109,7 @@ This is the kernel space implementation of the exit() system call.
 
 void kexit() {
     // The TaskTCB of the currently running task is deallocated.
-    free(RUNNING, sizeof(TaskTCB));
+    free((uint8_t*) RUNNING, sizeof(TaskTCB));
 
     // The pointer to the running task is set to NULL
     RUNNING = NULL;
