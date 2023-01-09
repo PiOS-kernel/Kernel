@@ -44,6 +44,31 @@ bool test_dequeue() {
     return true;
 }
 
+bool test_unlink_task() {
+    Queue q;
+    Queue_init(&q);
+
+    TaskTCB* task = NULL;
+    for (int i=0; i<5; i++) {
+        task = (TaskTCB*) alloc(sizeof(TaskTCB));
+        TaskTCB_init(task, i);
+
+        enqueue(&q, task);
+        ASSERT(!empty(&q));
+        ASSERT(count_tasks(&q) == i + 1);
+    }
+
+    int i = 5;
+    do {
+        ASSERT(count_tasks(&q) == i--);
+        TaskTCB* tmp = task->prev;
+        unlink_task(task);
+        task = tmp;
+    } while (task != NULL);
+
+    return true;
+}
+
 bool test_stack_push() {
     TaskTCB task;
     TaskTCB_init(&task, 0);
