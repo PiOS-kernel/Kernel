@@ -6,22 +6,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/*
-This is the system call provided to the user application, in order to
-create a new task.
-It accepts a function pointer, a pointer to its arguments, and a priority.
-The function simply invokes the kernel to request the given service.
-*/
-
-extern void create_task(void (*code)(void *), void* args, uint8_t priority);
-
-/*
-This is the system call provided to the user application to terminate execution
-of the current task.
-*/
-
-extern void exit();
-
 /* 
 On exit from an exception or interrupt handler, when the cortex m4 processor
 is running in thumb mode it expects bit[0] of the next instruction to execute to
@@ -33,6 +17,25 @@ be set to 0.
 /* This is the initial value for the XPSR register of a newly created task. */
 const uint32_t INITIAL_XPSR = 0x01000000;
 
+/**
+ * @brief: This is the system call provided to the user application, in order to
+ * create a new task.
+ * The function simply invokes the kernel to request the given service.
+ * @param: pointer to the task entry point.
+ * @param: pointer to the task arguments.
+ * @param: priority.
+ * @return: an handle to the created task, which serves as identifier.
+*/
+
+extern TaskHandle create_task(void (*code)(void *), void* args, uint8_t priority);
+
+/*
+This is the system call provided to the user application to terminate execution
+of the current task.
+*/
+
+extern void exit();
+
 /*
 This is the system call provided to the user application to make the current running task 
 yield the cpu and reset the sceduling alghoritm
@@ -40,8 +43,14 @@ yield the cpu and reset the sceduling alghoritm
 
 extern void yield();
 
-/*
+/**
+ *@brief: System call to terminate the execution of a task.
+ *@param: handle of the task that should be killed.
+*/
 
+extern void kill(TaskHandle task);
+
+/*
 Kernel space implementation for create_task(), brief description:
 This is the function used by the kernel to create a new task
 The functions pushes onto the task's empty stack the initial values
@@ -70,7 +79,7 @@ image of the stack when program execution is interruped by an
 interrupt handler.
 */
 
-void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
+TaskHandle kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
     // The task's TCB is created
     TaskTCB* tcb = (TaskTCB*) alloc(sizeof(TaskTCB));
     TaskTCB_init(tcb, priority);
@@ -101,6 +110,10 @@ void kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
 
     // The task is inserted into the tasks queue
     enqueue(&READY_QUEUES[priority], tcb);
+
+    // The pointer to the TCB is placed in r0, where it will be found
+    // by create_task.
+    return (TaskHandle) tcb;
 }
 
 /*
@@ -121,14 +134,6 @@ void kexit() {
     PendSVTrigger();
 }
 
-void unknownService(void) {
-    for (;;) {
-        uint32_t i;
-        for (i = 0; i < 0xFFFFF; i++) {
-            // busy waiting
-        }
-    }
-}
 /*
 This is the kernel implementation of the yield function
 */
@@ -141,7 +146,30 @@ void kyield() {
     PendSVTrigger();
 }
 
+/*
+Kernel space implementation of the kill syscall. The given task is
+removed from any task queue it is currently part of, and its memory
+is deallocated.
+*/
+
+void kkill(TaskHandle task) {
+    // The task is removed from any queue it is part of.
+    unlink_task((TaskTCB*) task);
+
+    // The task's memory is deallocated.
+    free((uint8_t*) task, sizeof(TaskTCB));
+}
+
 /* function called before the context switch */
 void pre_context_switch(){
     return;
+}
+
+void unknownService(void) {
+    for (;;) {
+        uint32_t i;
+        for (i = 0; i < 0xFFFFF; i++) {
+            // busy waiting
+        }
+    }
 }
