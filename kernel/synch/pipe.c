@@ -6,6 +6,7 @@ void init_pipe(PIPE *pipe){
     pipe->start = 0;
     pipe->end = 0;
     pipe->current_load = 0;
+    Queue_init(&pipe->waiting_on_pipe);
 }
 
 //used to add a message in the pipe
@@ -37,11 +38,15 @@ bool read_msg(PIPE *pipe, MESSAGE *msg){
         return false;                   //return false if the pipe is empty
     }
 }
-void wait() {
+void wait(PIPE *pipe) {
+    enqueue(&pipe->waiting_on_pipe,RUNNING);                //the task is saved on the waiting list ogf the pipe
     enqueue(&WAITING_QUEUES[RUNNING->priority],RUNNING);    //the task is placed in the waiting queue
     yield();                                                //and yields the cpu 
 }
 
 void unlock(PIPE* pipe){
-    
+    if (!empty(&pipe->waiting_on_pipe)){
+        TaskTCB *unlocked = dequeue(&pipe->waiting_on_pipe);
+        
+    }
 }

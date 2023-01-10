@@ -17,12 +17,13 @@ typedef struct PIPE {
   int end;
   int current_load;
   MESSAGE messages[PIPE_SIZE];
+  Queue waiting_on_pipe;
 } PIPE;
 
 void init_pipe(PIPE *pipe);
 bool pub_msg(PIPE *pipe, MESSAGE *msg);
 bool read_msg(PIPE *pipe, MESSAGE *msg);
-void wait();
+void wait(PIPE *pipe);
 void unlock(PIPE *pipe);
 
 
