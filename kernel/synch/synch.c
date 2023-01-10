@@ -54,7 +54,7 @@ uint8_t mutex_wait(MCB* lock){
 }
 
 uint8_t mutex_post(MCB* lock){
-    if(lock->lock == 1 && dynamicList_search(lock->owners, RUNNING)!=NULL){ // mutex has just 1 element
+    if(lock->lock == 1 && dynamicList_search(lock->owners, (uint32_t) RUNNING)!=NULL){ // mutex has just 1 element
         lock->lock = 0;
         dynamicList_remove(lock->owners, (uint32_t) RUNNING);
         enable_interrupts();

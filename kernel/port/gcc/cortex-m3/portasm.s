@@ -127,7 +127,7 @@ start_scheduler:
 SysTick_Handler:
 
     @ procedure called before context switch (user-defined)
-    ldreq r0, =pre_context_switch
+    ldr r0, =pre_context_switch
     str lr, [sp, #-4]! @ -4 
     blx r0 
     ldr pc, [sp], #4
