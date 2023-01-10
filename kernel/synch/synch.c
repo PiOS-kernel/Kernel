@@ -143,7 +143,8 @@ dynamicList_t* dynamicList_init(uint8_t size){
     list->base = (uint32_t) list + sizeof(dynamicList_t);
     list->size = size;
     uint32_t address;
-    for(int i = 0; i < list->size; i++){
+    int i = 0;
+    for(; i < list->size; i++){
         address = list->base + i * sizeof(uint32_t);
             *(uint32_t*)address = 0;
     }
@@ -159,7 +160,8 @@ dynamicList_t* dynamicList_init(uint8_t size){
  */
 uint8_t dynamicList_add(dynamicList_t* list, uint32_t item){
     uint32_t address;
-    for(int i = 0; i < list->size; i++){
+    int i = 0;
+    for(; i < list->size; i++){
         address = list->base + i * sizeof(uint32_t);
         if(*(uint32_t*)address == 0){
             *(uint32_t*)address = (uint32_t) item;
@@ -179,7 +181,8 @@ uint8_t dynamicList_add(dynamicList_t* list, uint32_t item){
  */
 uint8_t dynamicList_remove(dynamicList_t* list, uint32_t item){
     uint32_t address;
-    for(int i = 0; i < list->size; i++){
+    int i = 0;
+    for(; i < list->size; i++){
         address = list->base + i * sizeof(uint32_t);
         if(*(uint32_t*)address == item){
             *(uint32_t*)address = 0;
@@ -198,7 +201,8 @@ uint8_t dynamicList_remove(dynamicList_t* list, uint32_t item){
  */
 uint32_t* dynamicList_search(dynamicList_t* list, uint32_t item){
     uint32_t address;
-    for(int i = 0; i < list->size; i++){
+    int i = 0;
+    for(; i < list->size; i++){
         address = list->base + i * sizeof(uint32_t);
         if(*(uint32_t*)address == item){
             return (uint32_t*)address;
@@ -232,7 +236,8 @@ void update_max_ownerPriority(MCB* mcb){
     dynamicList_t* list = mcb->owners;
     TaskTCB** address;
     uint8_t max = MIN_PRIORITY +1;
-    for(int i = 0; i < list->size; i++){
+    int i = 0;
+    for(; i < list->size; i++){
         address = (TaskTCB**) (list->base + i * sizeof(uint32_t));
         if((*address)->priority < max){
             max = (*address)->priority;
@@ -267,7 +272,8 @@ void priority_inheritance(MCB* mcb){
  */
 TaskTCB* dynamicList_searchPriority(dynamicList_t* list, uint32_t p){
     TaskTCB** address;
-    for(int i = 0; i < list->size; i++){
+    int i = 0;
+    for(; i < list->size; i++){
         address = (TaskTCB**) (list->base + i * sizeof(uint32_t));
         if((*address)->priority == p){
             return *(address);
