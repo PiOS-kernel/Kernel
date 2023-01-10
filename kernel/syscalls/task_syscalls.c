@@ -140,3 +140,8 @@ void kyield() {
     // The scheduler is invoked.
     PendSVTrigger();
 }
+
+/* function called before the context switch */
+void pre_context_switch(){
+    return;
+}

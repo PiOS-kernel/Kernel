@@ -5,6 +5,7 @@ Heap HEAP;
 struct TaskTCB* RUNNING;
 uint32_t SHOULD_WAIT;
 Queue READY_QUEUES[MIN_PRIORITY];
+uint32_t CLOCK;
 
 void kernel_init() {
     // Initialize the heap
@@ -18,4 +19,8 @@ void kernel_init() {
     for (; i<MIN_PRIORITY; i++) {
         Queue_init(&READY_QUEUES[i]);
     }
+
+    // Initialize the clock
+    // The clock is incremented by sysTick after each quantum
+    CLOCK = 0;
 }

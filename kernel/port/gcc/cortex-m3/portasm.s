@@ -125,6 +125,13 @@ start_scheduler:
 .thumb_func
 .global SysTick_Handler
 SysTick_Handler:
+
+    @ procedure called before context switch (user-defined)
+    ldreq r0, =pre_context_switch
+    str lr, [sp, #-4]! @ -4 
+    blx r0 
+    ldr pc, [sp], #4
+
     @ The ticks counter is incremented 
     ldr r0, =TICKS_COUNTER 
     ldr r1, [r0] 
@@ -140,7 +147,13 @@ SysTick_Handler:
     
     @ The ticks counter is reset 
     mov r1, #0 
-    str r1, [r0] 
+    str r1, [r0]
+
+    @ The clock counter is incremented
+    ldr r0, =CLOCK
+    ldr r1, [r0]
+    add r1, r1, #1
+    str r1, [r0]
     
     @ The PendSV handler is triggered 
     ldr r0, =IRQ_CTRL_REGISTER 

@@ -9,5 +9,6 @@ void exit();
 void yield();
 void kcreate_task(void (*code)(void *), void *args, uint8_t priority);
 void task_switch();
+void pre_context_switch() __attribute__((weak));
 
 #endif
