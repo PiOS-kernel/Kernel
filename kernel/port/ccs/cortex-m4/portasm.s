@@ -18,6 +18,7 @@
     .ref IRQ_CTRL_REGISTER
     .ref PEND_SV_BIT
     .ref TICKS_COUNTER
+    .ref TASK_TIME_UNITS
     .ref CLOCK
     .ref pre_context_switch
 
@@ -29,6 +30,7 @@ constRUNNING:               .word RUNNING
 constIRQ_CTRL_REGISTER:     .word IRQ_CTRL_REGISTER
 constPEND_SV_BIT:           .word PEND_SV_BIT
 constTICKS_COUNTER:         .word TICKS_COUNTER
+constTASK_TIME_UNITS:		.word TASK_TIME_UNITS
 constCLOCK:                 .word CLOCK
 constpre_context_switch:    .word pre_context_switch
 ; ----------------------------------------------------------- 
