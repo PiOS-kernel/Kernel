@@ -5,8 +5,8 @@
 @ -----------------------------------------------------------
 
 .thumb_func
-.global SVCallISR
-SVCallISR:
+.global SVC_Handler
+SVC_Handler:
     @ Get the SVC number 
     ldr r4, [sp, #24] 
     ldrb r4, [r4, #-2] @ -2 

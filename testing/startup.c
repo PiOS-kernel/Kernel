@@ -27,7 +27,7 @@ __attribute__((weak, alias("_defaultHandler"))) void HardFaultISR();
 __attribute__((weak, alias("_defaultHandler"))) void MemManageISR();
 __attribute__((weak, alias("_defaultHandler"))) void BusFaultISR();
 __attribute__((weak, alias("_defaultHandler"))) void UsageFaultIsr();
-extern void SVCallISR();
+extern void SVC_Handler();
 __attribute__((weak, alias("_defaultHandler"))) void DebugMonitorISR();
 __attribute__((weak, alias("_defaultHandler"))) void PendsvISR();
 __attribute__((weak, alias("_defaultHandler"))) void SysTickISR();
@@ -50,7 +50,7 @@ void (* const g_pfnVectors[])(void) =
     0,                                      // Reserved
     0,                                      // Reserved
     0,                                      // Reserved
-    SVCallISR,						        // SVCall handler
+    SVC_Handler,						        // SVCall handler
     DebugMonitorISR,                        // Debug monitor handler
     0,                                      // Reserved
     PendsvISR,                              // The PendSV handler

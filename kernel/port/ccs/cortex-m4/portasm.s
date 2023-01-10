@@ -1,5 +1,5 @@
     .thumb
-    .global SVCallISR
+    .global SVC_Handler
     .global PendSV_Handler
     .global start_scheduler
     .global SysTick_Handler
@@ -32,7 +32,7 @@ constTICKS_COUNTER:         .word TICKS_COUNTER
 constCLOCK:                 .word CLOCK
 constpre_context_switch:    .word pre_context_switch
 ; ----------------------------------------------------------- 
-SVCallISR: .asmfunc
+SVC_Handler: .asmfunc
 
     ; Get the SVC number 
     ldr r4, [sp, #24] 
