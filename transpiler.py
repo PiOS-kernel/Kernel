@@ -282,7 +282,6 @@ class GCCtoCCSTranspiler(Transpiler):
         # adds external references to the header when function calls are
         # encountered
         if tokens[0] in ["bl", "blx"] and not is_general_purpose_register(tokens[1]):
-            print(tokens)
             self.external_references.append("    .ref " + tokens[1] + "\n")
         # Translates instructions loading variables into 
         # registers and translates comments
