@@ -18,6 +18,8 @@
     .ref IRQ_CTRL_REGISTER
     .ref PEND_SV_BIT
     .ref TICKS_COUNTER
+    .ref CLOCK
+    .ref pre_context_switch
 
 constkcreate_task:          .word kcreate_task
 constkexit:                 .word kexit
@@ -27,6 +29,8 @@ constRUNNING:               .word RUNNING
 constIRQ_CTRL_REGISTER:     .word IRQ_CTRL_REGISTER
 constPEND_SV_BIT:           .word PEND_SV_BIT
 constTICKS_COUNTER:         .word TICKS_COUNTER
+constCLOCK:                 .word CLOCK
+constpre_context_switch:    .word pre_context_switch
 ; ----------------------------------------------------------- 
 SVCallISR: .asmfunc
 
@@ -160,6 +164,18 @@ SysTick_Handler: .asmfunc
     ; The ticks counter is reset 
     mov r1, #0 
     str r1, [r0] 
+
+    ; The clock counter is incremented
+    ldr r0, constCLOCK 
+    ldr r1, [r0] 
+    add r1, r1, #1 
+    str r1, [r0] 
+
+    ; procedure called before context switch (user-defined)
+    ldr r5, constpre_context_switch
+    str lr, [sp, #-4]! ; -4 
+    blx r5
+    ldr lr, [sp], #4
 
     ; The PendSV handler is triggered 
     ldr r0, constIRQ_CTRL_REGISTER 
