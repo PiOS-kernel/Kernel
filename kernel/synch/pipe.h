@@ -2,9 +2,11 @@
 #define PIPE_H
 
 #include<stdbool.h>
+#include<synch.h>
 
 #define MESSAGE_SIZE 64
 #define PIPE_SIZE 4
+#define WAITING_SIZE 6
 
 //struct to create a MESSAGE type
 typedef struct MESSAGE {
@@ -17,7 +19,7 @@ typedef struct PIPE {
   int end;
   int current_load;
   MESSAGE messages[PIPE_SIZE];
-  Queue waiting_on_pipe;
+  MCB *semaphore;
 } PIPE;
 
 void init_pipe(PIPE *pipe);
