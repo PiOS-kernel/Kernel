@@ -4,14 +4,14 @@
     .global start_scheduler
     .global SysTick_Handler
     .global create_task
-    .global exit
+    .global task_exit
     .global yield
     .global kill
     .global enable_interrupts
     .global disable_interrupts
     .global PendSVTrigger
     .ref kcreate_task
-    .ref kexit
+    .ref ktask_exit
     .ref kyield
     .ref kkill
     .ref unknownService
@@ -25,7 +25,7 @@
     .ref pre_context_switch
 
 constkcreate_task:        .word kcreate_task
-constkexit:        .word kexit
+constktask_exit:        .word ktask_exit
 constkyield:        .word kyield
 constkkill:        .word kkill
 constunknownService:        .word unknownService
@@ -50,7 +50,7 @@ SVC_Handler: .asmfunc
     beq _callService 
     cmp r4, #0x2 
     itt eq 
-    ldreq r5, constkexit 
+    ldreq r5, constktask_exit 
     beq _callService 
     cmp r4, #0x3 
     itt eq 
@@ -208,7 +208,7 @@ create_task: .asmfunc
 
 ; ----------------------------------------------------------- 
 ; The system call that allows a task to terminate itself 
-exit: .asmfunc
+task_exit: .asmfunc
     svc #2 
     mov pc, lr 
 

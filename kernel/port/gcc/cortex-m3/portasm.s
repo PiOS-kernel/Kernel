@@ -19,7 +19,7 @@ SVC_Handler:
     
     cmp r4, #0x2 
     itt eq 
-    ldreq r5, =kexit 
+    ldreq r5, =ktask_exit 
     beq _callService 
 
     cmp r4, #0x3
@@ -181,8 +181,8 @@ create_task:
 @ ----------------------------------------------------------- 
 @ The system call that allows a task to terminate itself 
 .thumb_func
-.global exit
-exit:
+.global task_exit
+task_exit:
     svc #2 
     mov pc, lr 
 

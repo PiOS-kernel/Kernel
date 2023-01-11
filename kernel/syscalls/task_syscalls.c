@@ -34,7 +34,7 @@ This is the system call provided to the user application to terminate execution
 of the current task.
 */
 
-extern void exit();
+extern void task_exit();
 
 /*
 This is the system call provided to the user application to make the current running task 
@@ -117,10 +117,10 @@ TaskHandle kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
 }
 
 /*
-This is the kernel space implementation of the exit() system call.
+This is the kernel space implementation of the task_exit() system call.
 */
 
-void kexit() {
+void ktask_exit() {
     // The TaskTCB of the currently running task is deallocated.
     free((uint8_t*) RUNNING, sizeof(TaskTCB));
 
