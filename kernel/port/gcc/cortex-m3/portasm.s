@@ -26,6 +26,11 @@ SVC_Handler:
     itt eq
     ldreq r5, =kyield
     beq _callService
+
+    cmp r4, #0x4
+    itt eq
+    ldreq r5, =kkill
+    beq _callService
     
     @ No service corresponding to the SVC number is found 
     ldr r5, =unknownService 
@@ -93,11 +98,9 @@ scheduling_section:
     cpsie i 
     @ The register that tracks the current privilege level of the CPU 
     @ is modified to return to user mode 
-    @ -----------------
-    @ it stays in kernel mode -> for test purpose, until syscall yield() is implemented
 
-    @ mov r0, #1 
-    @ msr control, r0
+    mov r0, #1 
+    msr control, r0
 
     @ -----------------
     isb 
@@ -191,6 +194,16 @@ exit:
 .global yield
 yield:
     svc #3
+    mov pc, lr
+
+
+@ -----------------------------------------------------------
+
+@ System call to kill a running task
+.thumb_func
+.global kill
+kill:
+    svc #4
     mov pc, lr
     
 

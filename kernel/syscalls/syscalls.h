@@ -4,10 +4,13 @@
 #include <stdint.h>
 #include <stddef.h>
 
-void create_task(void (*code)(void *), void* args, uint8_t priority);
+typedef void* TaskHandle;
+
+TaskHandle create_task(void (*code)(void *), void* args, uint8_t priority);
 void exit();
 void yield();
-void kcreate_task(void (*code)(void *), void *args, uint8_t priority);
+void kill(TaskHandle task);
+TaskHandle kcreate_task(void (*code)(void *), void *args, uint8_t priority);
 void task_switch();
 void pre_context_switch() __attribute__((weak));
 
