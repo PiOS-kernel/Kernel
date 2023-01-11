@@ -104,5 +104,5 @@ void delete_event(EventHandle event) {
     // The message is stored just after the event object itself. It
     // must is freed together with the event object.
     uint32_t size = sizeof(Event) + ((Event*) event)->msg_size;
-    free((void*) event, size);
+    mem_free((void*) event, size);
 }

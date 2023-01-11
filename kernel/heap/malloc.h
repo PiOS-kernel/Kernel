@@ -6,6 +6,6 @@
 #include "heap.h"
 
 uint8_t* alloc(size_t size);
-void free(uint8_t* ptr, size_t size);
+void mem_free(uint8_t* ptr, size_t size);
 
 #endif

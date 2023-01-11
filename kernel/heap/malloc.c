@@ -17,7 +17,7 @@ uint8_t* alloc(size_t size) {
  * @param: the amount of memory to be de-allocated
 */
 
-void free(uint8_t* ptr, size_t size) {
+void mem_free(uint8_t* ptr, size_t size) {
     // The minimum amount of memory allocated is equal to SEGMENT_HEADER_SIZE
     if (size < SEGMENT_HEADER_SIZE)
         size = SEGMENT_HEADER_SIZE;

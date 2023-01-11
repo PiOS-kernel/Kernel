@@ -122,7 +122,7 @@ This is the kernel space implementation of the task_exit() system call.
 
 void ktask_exit() {
     // The TaskTCB of the currently running task is deallocated.
-    free((uint8_t*) RUNNING, sizeof(TaskTCB));
+    mem_free((uint8_t*) RUNNING, sizeof(TaskTCB));
 
     // The pointer to the running task is set to NULL
     RUNNING = NULL;
@@ -157,7 +157,7 @@ void kkill(TaskHandle task) {
     unlink_task((TaskTCB*) task);
 
     // The task's memory is deallocated.
-    free((uint8_t*) task, sizeof(TaskTCB));
+    mem_free((uint8_t*) task, sizeof(TaskTCB));
 }
 
 /* function called before the context switch */
