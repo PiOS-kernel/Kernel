@@ -7,8 +7,10 @@
 
 // global variables
 #define STACK_SIZE 4096
+#define IDLE_TASK_SIZE sizeof(uint32_t) * 15
 #define MIN_PRIORITY 10         //low values of prioriry represent the higher priority
 extern struct TaskTCB *RUNNING;
+extern struct TaskTCB *IDLE_TASK;
 extern uint32_t SHOULD_WAIT; 
 
 // Definition of the Task Control Block.
@@ -27,11 +29,20 @@ typedef struct TaskTCB
     struct TaskTCB* prev;               // reference to the previous Task_TCB in the list
 } TaskTCB;
 
+typedef struct IdleTaskTCB
+{
+    uint8_t* stp;                       // stack pointer
+    uint8_t priority;                   // will always be set to 0
+    uint8_t default_priority;           // will always be set to 0
+    uint8_t _word_alignment_filling[2]; // padding to align the next field on a 4-byte boundary
+    uint8_t stack[IDLE_TASK_SIZE];      // the idle task's stack is only 4 words of size
+} IdleTaskTCB;
+
 typedef struct Queue
 {
     TaskTCB* head;
     TaskTCB* tail;
-}Queue;
+} Queue;
 
 //prioriy queues
 extern Queue READY_QUEUES[MIN_PRIORITY];
@@ -50,5 +61,10 @@ TaskTCB* dequeue (Queue* q);
 void enqueue (Queue* q, TaskTCB *task);
 int count_tasks( Queue* q);
 TaskTCB* schedule();
+
+// idle task initialization routine
+void idle_task_init();
+// idle task code.
+void idle_task_code(void* _) __attribute__((weak));
 
 #endif

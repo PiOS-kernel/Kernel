@@ -123,14 +123,14 @@ int count_tasks( Queue* q)
     return count;
 }
 
-//return the higer priority task ready to be executed 
+//return the higest priority task ready to be executed 
 TaskTCB* schedule() 
 {
     TaskTCB *selected = NULL;
 
     // get the priority of the running task
     int running_priority = MIN_PRIORITY - 1;
-    if (RUNNING != NULL)
+    if (RUNNING != NULL && !SHOULD_WAIT)
         running_priority = RUNNING->priority;
 
     // look for a task in the ready queues with a priority higher or equal
@@ -147,9 +147,11 @@ TaskTCB* schedule()
 
     // If there was a running task, and the scheduler has selected
     // a new task to be executed, the previously running task is
-    // inserted back in the ready queue. Also, if the task wishes to enter
-    // the WAIT state, it is not inserted back in the ready queue.
-    if (RUNNING != NULL && selected != NULL && !SHOULD_WAIT) 
+    // inserted back in the ready queue. 
+    // The RUNNING task is not inserted in the ready queue if it wishes 
+    // to enter the WAITING state, or it is the IDLE_TASK, or if no other
+    // READY task of appropriate priority is available.
+    if (RUNNING != NULL && selected != NULL && selected != IDLE_TASK && !SHOULD_WAIT) 
         enqueue(&READY_QUEUES[RUNNING->priority], RUNNING);
     
     // Set the SHOULD_WAIT flag to false
@@ -157,7 +159,14 @@ TaskTCB* schedule()
 
     if (selected != NULL) {
         RUNNING = selected; // set the selected task as the running task
-        return selected;
+    } else if (RUNNING == NULL) {
+        // if there is no running task, and no task is selected, 
+        // the idle task is executed
+        RUNNING = IDLE_TASK;
     }
     return RUNNING;
+}
+
+void idle_task_code(void* _) {
+    while(1);
 }

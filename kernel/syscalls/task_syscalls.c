@@ -117,6 +117,41 @@ TaskHandle kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
 }
 
 /*
+Initialization routine for the IDLE task. This task will be executed when no other
+task is in the READY state. Its stack is just big enough to store the task's registers.
+*/
+
+void idle_task_init() {
+    IDLE_TASK = (TaskTCB*) alloc(sizeof(IdleTaskTCB));
+    // the idle task runs at the lowest priority
+    TaskTCB_init(IDLE_TASK, MIN_PRIORITY - 1);
+
+    uint32_t zeros[12];
+    memset((uint8_t*) zeros, 0, sizeof(uint32_t) * 12);
+
+    // The XPSR register is pushed onto the stack.
+    IDLE_TASK->stp -= 4;
+    *((uint32_t*) IDLE_TASK->stp) = INITIAL_XPSR;
+
+    // The program counter is pushed onto the stack. It will contain a
+    // pointer to the task's entry point.
+    IDLE_TASK->stp -= 4;
+    *((uint32_t*) IDLE_TASK->stp) = (uint32_t) idle_task_code & PC_MASK;
+
+    // Then the link register is pushed and initialized to 0.
+    stack_push(IDLE_TASK, (uint8_t*) zeros, sizeof(uint32_t));
+
+    // Then r12, r3, r2, r1, and r0 are pushed onto the stack. Only r0
+    // has a non-zero value, which is the pointer to the arguments.
+    stack_push(IDLE_TASK, (uint8_t*) zeros, sizeof(uint32_t) * 4);
+    stack_push(IDLE_TASK, (uint8_t*) 0, sizeof(void *));
+
+    // Finally, registers r4 through r11 are pushed onto the stack and
+    // 0-initialized.
+    stack_push(IDLE_TASK, (uint8_t*) zeros, sizeof(size_t) * 8);
+}
+
+/*
 This is the kernel space implementation of the task_exit() system call.
 */
 
