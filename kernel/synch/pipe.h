@@ -19,14 +19,19 @@ typedef struct PIPE {
   int end;
   int current_load;
   MESSAGE messages[PIPE_SIZE];
-  MCB *semaphore;
+  MCB *read_mutex;
+  MCB *write_mutex;
+  Queue waiting_on_read;
+  Queue waiting_on_write;
 } PIPE;
 
 void init_pipe(PIPE *pipe);
 bool pub_msg(PIPE *pipe, MESSAGE *msg);
 bool read_msg(PIPE *pipe, MESSAGE *msg);
-void wait(PIPE *pipe);
-void unlock(PIPE *pipe);
+void wait_reading(PIPE *pipe);
+void wait_writing(PIPE *pipe);
+void unlock_reading(PIPE *pipe);
+void unlock_writing(PIPE *pipe);
 
 
 #endif
