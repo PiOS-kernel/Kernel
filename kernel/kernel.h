@@ -9,5 +9,6 @@
 
 void kernel_init();
 void start_scheduler();
+uint32_t get_clock();
 
 #endif
