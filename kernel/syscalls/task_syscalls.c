@@ -118,6 +118,13 @@ void kcreate_task(void (*code)(void *), void *args, uint8_t priority, TaskHandle
 }
 
 /*
+    This syscall returns the TaskHandle of the current task
+*/
+TaskHandle get_my_taskHandle() {
+    return (TaskHandle) RUNNING;
+}
+
+/*
 Initialization routine for the IDLE task. This task will be executed when no other
 task is in the READY state. Its stack is just big enough to store the task's registers.
 */
