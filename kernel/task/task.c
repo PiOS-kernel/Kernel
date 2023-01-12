@@ -9,6 +9,7 @@ void TaskTCB_init(TaskTCB* tcb, uint8_t p)
     tcb->default_priority = p;
     tcb->next = NULL;
     tcb->prev = NULL;
+    tcb->owner = NULL;
     // The stack pointer is initialized to the end address of the task's stack
     tcb->stp = (uint8_t*) (tcb->stack + STACK_SIZE);
 }
@@ -41,6 +42,18 @@ void stack_push(TaskTCB * task, uint8_t* src, int size)
 // Function to unlink a task from the linked list it belongs to
 void unlink_task(TaskTCB *task)
 {
+    // if the task is the head of the list, update the head.
+    // if the queue only contains one item, both the head and the tail
+    // point to the same TCB
+    if (task->owner != NULL && task->owner->head == task)
+    {
+        task->owner->head = task->next;
+        if (task->owner->head == NULL)
+            task->owner->tail = NULL;
+        task->owner = NULL;
+    }
+
+    // update the next and prev pointers of the adjacent tasks
     if (task->prev != NULL)
     {
         task->prev->next = task->next;
@@ -83,25 +96,15 @@ void enqueue (Queue* q, TaskTCB *task)
         task->next = NULL;
         q->tail = task; // update the tail to the new end of the queue
     }
+    task->owner = q;
 }
 
-// dequque the first element of the queue
+// dequeue the first element of the queue
 TaskTCB* dequeue (Queue* q){
     if (!empty(q))
     {
         TaskTCB *old_head = q->head;
-        if (old_head->next != NULL)
-        {
-            // shift the head to the following element in the queue 
-            q->head = old_head->next;
-            q->head->prev = NULL;
-            old_head->next = NULL;
-        }
-        else
-        {
-            q->head = NULL;
-            q->tail = NULL;
-        }
+        unlink_task(old_head);
         return old_head; // return the popped element
     }
     else

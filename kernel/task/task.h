@@ -27,6 +27,8 @@ typedef struct TaskTCB
     uint8_t stack[STACK_SIZE];          // stack associated to the task
     struct TaskTCB* next;               // reference to the next Task_TCB in the list
     struct TaskTCB* prev;               // reference to the previous Task_TCB in the list
+    struct Queue* owner;                // reference to the list that points to this TCB. 
+                                        // It is different than NULL only if that item is the head of the list
 } TaskTCB;
 
 typedef struct IdleTaskTCB
