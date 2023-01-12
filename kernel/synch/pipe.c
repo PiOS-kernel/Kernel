@@ -1,5 +1,6 @@
-#include <pipe.h>
-#include <task.h>
+#include "pipe.h"
+#include "../task/task.h"
+#include "../utils/utils.h"
 
 //initialize to 0 the pipe fileds 
 void init_pipe(PIPE *pipe){
@@ -31,7 +32,7 @@ bool read_msg(PIPE *pipe, MESSAGE *msg){
     synch_wait(pipe->semaphore);
     if (pipe->current_load > 0){
         *msg = pipe->messages[pipe->start];                       //save in msg the first message of the pipe
-        memset(pipe->messages[pipe->start],0,sizeof(MESSAGE));    //then delete the message just read
+        memset((uint8_t*) &(pipe->messages[pipe->start]),0,sizeof(MESSAGE));    //then delete the message just read
         pipe->start = (pipe->start+1) % PIPE_SIZE;               //update the start index and current load counter
         pipe->current_load--;
         return true;

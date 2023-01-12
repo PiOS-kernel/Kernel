@@ -1,8 +1,8 @@
 #ifndef PIPE_H
 #define PIPE_H
 
-#include<stdbool.h>
-#include<synch.h>
+#include <stdbool.h>
+#include "synch.h"
 
 #define MESSAGE_SIZE 64
 #define PIPE_SIZE 4
