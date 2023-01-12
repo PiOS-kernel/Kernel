@@ -153,9 +153,6 @@ TaskTCB* schedule()
     // READY task of appropriate priority is available.
     if (RUNNING != NULL && selected != NULL && selected != IDLE_TASK && !SHOULD_WAIT) 
         enqueue(&READY_QUEUES[RUNNING->priority], RUNNING);
-    
-    // Set the SHOULD_WAIT flag to false
-    SHOULD_WAIT = 0;
 
     if (selected != NULL) {
         RUNNING = selected; // set the selected task as the running task
@@ -164,6 +161,10 @@ TaskTCB* schedule()
         // the idle task is executed
         RUNNING = IDLE_TASK;
     }
+ 
+    // Set the SHOULD_WAIT flag to false
+    SHOULD_WAIT = 0;
+    
     return RUNNING;
 }
 
