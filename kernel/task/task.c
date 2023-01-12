@@ -151,7 +151,7 @@ TaskTCB* schedule()
     // The RUNNING task is not inserted in the ready queue if it wishes 
     // to enter the WAITING state, or it is the IDLE_TASK, or if no other
     // READY task of appropriate priority is available.
-    if (RUNNING != NULL && selected != NULL && selected != IDLE_TASK && !SHOULD_WAIT) 
+    if (RUNNING != NULL && selected != NULL && RUNNING != IDLE_TASK && !SHOULD_WAIT) 
         enqueue(&READY_QUEUES[RUNNING->priority], RUNNING);
 
     if (selected != NULL) {

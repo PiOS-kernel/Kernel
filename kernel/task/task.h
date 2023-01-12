@@ -7,7 +7,7 @@
 
 // global variables
 #define STACK_SIZE 4096
-#define IDLE_TASK_SIZE sizeof(uint32_t) * 15
+#define IDLE_TASK_SIZE 512
 #define MIN_PRIORITY 10         //low values of prioriry represent the higher priority
 extern struct TaskTCB *RUNNING;
 extern struct TaskTCB *IDLE_TASK;
@@ -35,7 +35,7 @@ typedef struct IdleTaskTCB
     uint8_t priority;                   // will always be set to 0
     uint8_t default_priority;           // will always be set to 0
     uint8_t _word_alignment_filling[2]; // padding to align the next field on a 4-byte boundary
-    uint8_t stack[IDLE_TASK_SIZE];      // the idle task's stack is only 4 words of size
+    uint8_t stack[IDLE_TASK_SIZE];      // the idle task's stack is smaller than the regular stack size
 } IdleTaskTCB;
 
 typedef struct Queue
