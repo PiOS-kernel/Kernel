@@ -111,7 +111,7 @@ void task3(void* arg) {
 }
 
 bool test_schedule() {
-    ASSERT(schedule() == NULL);
+    ASSERT(schedule() == IDLE_TASK);
 
     kcreate_task(task1, NULL, 0);
     kcreate_task(task2, NULL, 1);
@@ -135,7 +135,7 @@ bool test_schedule() {
 }
 
 bool test_schedule1() {
-    ASSERT(schedule() == NULL);
+    ASSERT(schedule() == IDLE_TASK);
 
     kcreate_task(task1, NULL, 0);
     kcreate_task(task2, NULL, 1);

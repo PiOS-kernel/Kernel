@@ -2,6 +2,9 @@
 #include "../../kernel/kernel.h"
 #include <stdbool.h>
 
+extern void _heap_init();
+extern void _scheduler_init();
+
 // Heap tests
 extern bool test_heap_init();
 extern bool test_count_segments();
@@ -78,7 +81,8 @@ void tests_runner() {
     for (int i = 0; i < tests; i++) {
         // The kernel is initialized before each test to reset the heap
         // and the tasks queues.
-        kernel_init();
+        _heap_init();
+        _scheduler_init();
 
         serial_print(all_tests[i].name);
         serial_print(" ... ");
