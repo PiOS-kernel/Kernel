@@ -159,7 +159,7 @@ TaskTCB* schedule()
 
     if (selected != NULL) {
         RUNNING = selected; // set the selected task as the running task
-    } else if (RUNNING == NULL) {
+    } else if (RUNNING == NULL || SHOULD_WAIT) {
         // if there is no running task, and no task is selected, 
         // the idle task is executed
         RUNNING = IDLE_TASK;
