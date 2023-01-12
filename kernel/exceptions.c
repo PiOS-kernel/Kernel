@@ -32,7 +32,7 @@ typedef struct SysTick {
 
 /* Number of time units (in milliseconds) dedicated to a single task, before interrupting it */
 
-const uint32_t TASK_TIME_UNITS = 10;
+uint32_t TASK_TIME_UNITS = 10;
 
 static const uint32_t MASK24 = 0x00FFFFFF;
 
