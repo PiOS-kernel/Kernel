@@ -24,10 +24,11 @@ const uint32_t INITIAL_XPSR = 0x01000000;
  * @param: pointer to the task entry point.
  * @param: pointer to the task arguments.
  * @param: priority.
+ * @param: destination address where the value of the task handle will be written.
  * @return: an handle to the created task, which serves as identifier.
 */
 
-extern TaskHandle create_task(void (*code)(void *), void* args, uint8_t priority);
+extern void create_task(void (*code)(void *), void* args, uint8_t priority, TaskHandle* handle);
 
 /*
 This is the system call provided to the user application to terminate execution
@@ -79,7 +80,7 @@ image of the stack when program execution is interruped by an
 interrupt handler.
 */
 
-TaskHandle kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
+void kcreate_task(void (*code)(void *), void *args, uint8_t priority, TaskHandle* handle) {
     // The task's TCB is created
     TaskTCB* tcb = (TaskTCB*) alloc(sizeof(TaskTCB));
     TaskTCB_init(tcb, priority);
@@ -111,9 +112,9 @@ TaskHandle kcreate_task(void (*code)(void *), void *args, uint8_t priority) {
     // The task is inserted into the tasks queue
     enqueue(&READY_QUEUES[priority], tcb);
 
-    // The pointer to the TCB is placed in r0, where it will be found
-    // by create_task.
-    return (TaskHandle) tcb;
+    // The pointer to the TCB is written to the destination address provided
+    // by the application
+    *handle = (TaskHandle) tcb;
 }
 
 /*

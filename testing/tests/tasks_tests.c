@@ -113,9 +113,9 @@ void task3(void* arg) {
 bool test_schedule() {
     ASSERT(schedule() == IDLE_TASK);
 
-    kcreate_task(task1, NULL, 0);
-    kcreate_task(task2, NULL, 1);
-    kcreate_task(task3, NULL, 2);
+    kcreate_task(task1, NULL, 0, NULL);
+    kcreate_task(task2, NULL, 1, NULL);
+    kcreate_task(task3, NULL, 2, NULL);
 
     // Tasks 2 and 3 should never get the CPU, because they have lower
     // priorities than task 1.
@@ -137,9 +137,9 @@ bool test_schedule() {
 bool test_schedule1() {
     ASSERT(schedule() == IDLE_TASK);
 
-    kcreate_task(task1, NULL, 0);
-    kcreate_task(task2, NULL, 1);
-    kcreate_task(task3, NULL, 2);
+    kcreate_task(task1, NULL, 0, NULL);
+    kcreate_task(task2, NULL, 1, NULL);
+    kcreate_task(task3, NULL, 2, NULL);
 
     // First task to get the CPU is task 1.
     TaskTCB *t = schedule();

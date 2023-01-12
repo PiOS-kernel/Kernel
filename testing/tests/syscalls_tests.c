@@ -8,7 +8,7 @@ void mock_task(void *arg)
 
 bool test_create_task() {
     char* name = "Mario!";
-    create_task(mock_task, (void*) name, 0);
+    create_task(mock_task, (void*) name, 0, NULL);
     ASSERT(count_tasks(&READY_QUEUES[0]) == 1);
     TaskTCB* created_task = dequeue(&READY_QUEUES[0]);
     ASSERT(created_task != NULL);
