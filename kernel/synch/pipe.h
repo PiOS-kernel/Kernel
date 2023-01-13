@@ -6,7 +6,6 @@
 
 #define MESSAGE_SIZE 64
 #define PIPE_SIZE 4
-#define WAITING_SIZE 6
 
 //struct to create a MESSAGE type
 typedef struct MESSAGE {
