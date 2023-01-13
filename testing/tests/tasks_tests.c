@@ -63,8 +63,36 @@ bool test_unlink_task() {
         ASSERT(count_tasks(&q) == i--);
         TaskTCB* tmp = task->prev;
         unlink_task(task);
+        mem_free(task, sizeof(TaskTCB));
         task = tmp;
     } while (task != NULL);
+
+    for (int i=0; i<5; i++) {
+        task = (TaskTCB*) alloc(sizeof(TaskTCB));
+        TaskTCB_init(task, i);
+
+        enqueue(&q, task);
+        ASSERT(!empty(&q));
+        ASSERT(count_tasks(&q) == i + 1);
+    }
+
+    TaskTCB* middle = q.head;
+    for (int i=0; i<2; ++i) {
+        middle = middle->next;
+    }
+
+    unlink_task(middle->prev);
+    ASSERT(middle->prev == q.head);
+    unlink_task(middle->next);
+    ASSERT(middle->next == q.tail);
+    unlink_task(middle->prev);
+    ASSERT(middle == q.head);
+    ASSERT(middle->next == q.tail);
+    unlink_task(middle->next);
+    ASSERT(middle == q.tail);
+    serial_println("here");
+    unlink_task(middle);
+    ASSERT(empty(&q));
 
     return true;
 }

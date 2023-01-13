@@ -153,6 +153,14 @@ void idle_task_init() {
 }
 
 /*
+This syscall return the TaskHandle of the currently running task
+*/
+
+TaskHandle get_my_taskHandle() {
+    return (TaskHandle) RUNNING;
+}
+
+/*
 This is the kernel space implementation of the task_exit() system call.
 */
 

@@ -41,3 +41,7 @@ void _scheduler_init() {
         Queue_init(&READY_QUEUES[i]);
     }
 }
+
+uint32_t get_clock(){
+    return CLOCK;
+}

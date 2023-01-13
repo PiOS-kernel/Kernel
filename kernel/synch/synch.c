@@ -2,6 +2,7 @@
 #include "../heap/malloc.h"
 #include "../exceptions.h"
 #include "../task/task.h"
+#include "../syscalls/syscalls.h"
 
 
 
@@ -102,7 +103,7 @@ void synch_wait(MCB* lock){
         update_max_waitPriority(lock);
         priority_inheritance(lock);
         enable_interrupts();
-        PendSVTrigger();
+        yield();
         // ownership will be yielded by another task, it should NOT be self-assigned
     }
     enable_interrupts();

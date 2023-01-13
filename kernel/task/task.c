@@ -42,28 +42,22 @@ void stack_push(TaskTCB * task, uint8_t* src, int size)
 // Function to unlink a task from the linked list it belongs to
 void unlink_task(TaskTCB *task)
 {
-    // if the task is the head of the list, update the head.
-    // if the queue only contains one item, both the head and the tail
-    // point to the same TCB
-    if (task->owner != NULL && task->owner->head == task)
-    {
-        task->owner->head = task->next;
-        if (task->owner->head == NULL)
-            task->owner->tail = NULL;
-        task->owner = NULL;
-    }
+    TaskTCB* prev = task->prev;
+    TaskTCB* next = task->next;
 
     // update the next and prev pointers of the adjacent tasks
-    if (task->prev != NULL)
-    {
-        task->prev->next = task->next;
-    }
-    if (task->next != NULL)
-    {
-        task->next->prev = task->prev;
-    }
+    if (prev != NULL)
+        prev->next = task->next;
+    if (next != NULL)
+        next->prev = task->prev;
     task->next = NULL;
     task->prev = NULL;
+
+    // update the head and tail of the queue
+    if (task == task->owner->head)
+        task->owner->head = next;
+    if (task == task->owner->tail)
+        task->owner->tail = prev;
 }
 
 // initialize the queue with both head and tail NULL
