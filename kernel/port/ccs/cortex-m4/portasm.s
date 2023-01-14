@@ -81,6 +81,12 @@ PendSV_Handler: .asmfunc
     cpsid i 
     isb 
 
+    ; procedure called before context switch (user-defined) 
+    ldr r0, constpre_context_switch 
+    str lr, [sp, #-4]! ; -4 
+    blx r0 
+    ldr lr, [sp], #4
+
     ; r0 is loaded with the pointer to the running task 
     ldr r0, constRUNNING 
     ldr r0, [r0] 
@@ -177,13 +183,7 @@ SysTick_Handler: .asmfunc
     ldr r0, constCLOCK 
     ldr r1, [r0] 
     add r1, r1, #1 
-    str r1, [r0] 
-
-    ; procedure called before context switch (user-defined) 
-    ldr r5, constpre_context_switch 
-    str lr, [sp, #-4]! ; -4 
-    blx r5 
-    ldr lr, [sp], #4 
+    str r1, [r0]  
 
     ; The PendSV handler is triggered 
     ldr r0, constIRQ_CTRL_REGISTER 
