@@ -52,6 +52,12 @@ PendSV_Handler:
     cpsid i 
     isb
 
+    @ procedure called before context switch (user-defined)
+    ldr r0, =pre_context_switch
+    str lr, [sp, #-4]! @ -4 
+    blx r0
+    ldr lr, [sp], #4
+
     @ r0 is loaded with the pointer to the running task 
     ldr r0, =RUNNING 
     ldr r0, [r0] 
@@ -152,11 +158,6 @@ SysTick_Handler:
     add r1, r1, #1 
     str r1, [r0] 
 
-    @ procedure called before context switch (user-defined)
-    ldr r5, =pre_context_switch
-    str lr, [sp, #-4]! @ -4 
-    blx r5
-    ldr lr, [sp], #4
     
     @ The PendSV handler is triggered 
     ldr r0, =IRQ_CTRL_REGISTER 

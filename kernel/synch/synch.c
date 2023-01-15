@@ -15,8 +15,8 @@ MCB* mutex_init() {
     for (; i<MIN_PRIORITY; i++) {
          Queue_init(&(mcb->waiting[i]));
     }
-    mcb->max_priority_owners = -1;
-    mcb->max_priority_waiting = -1;
+    mcb->max_priority_owners = MIN_PRIORITY;
+    mcb->max_priority_waiting = MIN_PRIORITY;
     return mcb;
 }
 
@@ -35,8 +35,8 @@ MCB* semaphore_init(uint32_t c){
     for (; i<MIN_PRIORITY; i++) {
          Queue_init(&(mcb->waiting[i]));
     }
-    mcb->max_priority_owners = -1;
-    mcb->max_priority_waiting = -1;
+    mcb->max_priority_owners = MIN_PRIORITY;
+    mcb->max_priority_waiting = MIN_PRIORITY;
     return mcb;
 }
 
@@ -58,6 +58,7 @@ uint8_t mutex_post(MCB* lock){
     if(lock->lock == 1 && dynamicList_search(lock->owners, (uint32_t) RUNNING)!=NULL){ // mutex has just 1 element
         lock->lock = 0;
         dynamicList_remove(lock->owners, (uint32_t) RUNNING);
+        update_max_ownerPriority(lock);
         enable_interrupts();
         return 1;
     }
@@ -118,7 +119,7 @@ void synch_post(MCB* lock){
     }
      // reset priority inheritance
     RUNNING->priority = RUNNING->default_priority;
-    if(lock->max_priority_waiting != -1){ // waiting is not empty
+    if(lock->max_priority_waiting != MIN_PRIORITY){ // waiting is not empty
         // choose the task to add to owners
         TaskTCB* task = dequeue(&(lock->waiting[lock->max_priority_waiting]));
         enqueue(&READY_QUEUES[task->priority], task);
@@ -218,7 +219,7 @@ uint32_t* dynamicList_search(dynamicList_t* list, uint32_t item){
  * 
  * @param mcb 
  * @param vector -> it's the vector of priority queues
- * @param value -> the value to update - if the vector is empty, the value is set to -1
+ * @param value -> the value to update - if the vector is empty, the value is set to MIN_PRIORITY
  */
 void update_max_waitPriority(MCB* mcb){
     Queue* vector = mcb->waiting;
@@ -229,8 +230,8 @@ void update_max_waitPriority(MCB* mcb){
             return;
         }
     }
-    // if the vector is empty, set priority to -1
-    mcb->max_priority_waiting = -1;
+    // if the vector is empty, set priority to MIN_PRIORITY
+    mcb->max_priority_waiting = MIN_PRIORITY;
 }
 
 void update_max_ownerPriority(MCB* mcb){
@@ -245,8 +246,8 @@ void update_max_ownerPriority(MCB* mcb){
         }
     }
     if(max == MIN_PRIORITY +1){
-        // if the vector is empty, set priority to -1
-        mcb->max_priority_owners = -1;
+        // if the vector is empty, set priority to MIN_PRIORITY
+        mcb->max_priority_owners = MIN_PRIORITY;
     } else {
         mcb->max_priority_owners = max;
     }
