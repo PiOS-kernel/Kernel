@@ -1,7 +1,6 @@
 #ifndef PIPE_H
 #define PIPE_H
 
-#include <stdbool.h>
 #include "synch.h"
 
 #define MESSAGE_SIZE 64
@@ -21,12 +20,12 @@ typedef struct PIPE {
   MCB *read_mutex;
   MCB *write_mutex;
   Queue waiting_on_read;
-  Queue waiting_on_write;
+  TaskTCB *waiting_on_write;
 } PIPE;
 
 void init_pipe(PIPE *pipe);
-bool pub_msg(PIPE *pipe, MESSAGE *msg);
-bool read_msg(PIPE *pipe, MESSAGE *msg);
+void pub_msg(PIPE *pipe, MESSAGE *msg);
+void read_msg(PIPE *pipe, MESSAGE *msg);
 void wait_reading(PIPE *pipe);
 void wait_writing(PIPE *pipe);
 void unlock_reading(PIPE *pipe);
