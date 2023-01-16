@@ -18,40 +18,11 @@ PIPE *init_pipe(int lenght, uint32_t msg_size){
     pipe->messages = (char*) alloc(lenght*msg_size); 
 }
 
-//used to add a message in the pipe
-/*void pub_msg(PIPE *pipe, MESSAGE *msg){
-    synch_wait(pipe->write_mutex);      //try to acquire the mutex for writing
-    if(pipe->current_load >= pipe->pipe_size){ //check if there is room left for another message
-        wait_writing(pipe);             //the task should wait untill a task read from the pipe
-    }    
-    if (pipe->end == pipe->pipe_size){    //check if the circular index is going out of bound
-        pipe->end = 0;
-    }
-    pipe->messages[pipe->end] = *msg;  //add the message and update the end index and current load counter
-    pipe->end++;
-    pipe->current_load++;
-    unlock_reading(pipe);               //awake readers
-    synch_post(pipe->write_mutex);      //free the mutex                  
-}
-
-//used to read the first message of the pipe and saving in in msg
-void read_msg(PIPE *pipe, MESSAGE *msg){
-    synch_wait(pipe->read_mutex);                                           //try to acquire the mutex for reading
-    if (pipe->current_load == 0){                                            //check if the pipe is empty
-        wait_reading(pipe);                             //the task should wait for the pipe to have a message
-    }
-    *msg = pipe->messages[pipe->start];                                     //save in msg the first message of the pipe
-    memset((uint8_t*) &(pipe->messages[pipe->start]),0,sizeof(MESSAGE));    //then delete the message just read
-    pipe->start = (pipe->start+1) % pipe->pipe_size;                              //update the start index and current load counter
-    pipe->current_load--;
-    unlock_writing(pipe);                                                   //awake writers
-    synch_post(pipe->read_mutex);                                           //free the mutex           
-}
-*/
+//used to write a message in the pipe
 void pub_msg(PIPE *pipe, void *msg){
-    synch_wait(pipe->write_mutex);      //try to acquire the mutex for writing
-    if(pipe->current_load >= pipe->pipe_size){ //check if there is room left for another message
-        wait_writing(pipe);             //the task should wait untill a task read from the pipe
+    synch_wait(pipe->write_mutex);                  //try to acquire the mutex for writing
+    if(pipe->current_load >= pipe->pipe_size){      //check if there is room left for another message
+        wait_writing(pipe);                         //the task should wait untill a task read from the pipe
     }    
     if (pipe->end == pipe->pipe_size*pipe->msg_size){    //check if the circular index is going out of bound
         pipe->end = 0;
@@ -66,12 +37,12 @@ void pub_msg(PIPE *pipe, void *msg){
 //used to read the first message of the pipe and saving it in msg
 void read_msg(PIPE *pipe, void *msg){
     synch_wait(pipe->read_mutex);                                           //try to acquire the mutex for reading
-    if (pipe->current_load == 0){                                            //check if the pipe is empty
+    if (pipe->current_load == 0){                                           //check if the pipe is empty
         wait_reading(pipe);                             //the task should wait for the pipe to have a message
     }
-    memcpy(pipe->messages[pipe->start],msg,pipe->msg_size);                 //save in msg the first message of the pipe
-    memset((uint8_t*) &(pipe->messages[pipe->start]),0,sizeof(MESSAGE));    //then delete the message just read from the pipe
-    pipe->start = (pipe->start+pipe->msg_size) % pipe->pipe_size;           //update the start index and current load counter
+    memcpy(pipe->messages[pipe->start],msg,pipe->msg_size);                         //save in msg the first message of the pipe
+    memset((uint8_t*) &(pipe->messages[pipe->start]),0,sizeof(pipe->msg_size));     //then delete the message just read from the pipe
+    pipe->start = (pipe->start+pipe->msg_size) % pipe->pipe_size;                   //update the start index and current load counter
     pipe->current_load--;
     unlock_writing(pipe);                                                   //awake writers
     synch_post(pipe->read_mutex);                                           //free the mutex           

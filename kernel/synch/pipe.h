@@ -5,11 +5,6 @@
 
 #define NEW_PIPE(lenght, msg_type) init_pipe(lenght, sizeof(msg_type))
 
-//struct to create a MESSAGE type
-typedef struct MESSAGE {
-  char data[];
-} MESSAGE;
-
 //struct defining the pipe as a ciclic message queue 
 typedef struct PIPE {
   int start;
