@@ -25,8 +25,8 @@ typedef struct PIPE {
 } PIPE;
 
 PIPE *init_pipe(int lenght, uint32_t msg_size);
-void pub_msg(PIPE *pipe, MESSAGE *msg); 
-void read_msg(PIPE *pipe, MESSAGE *msg);
+void pub_msg(PIPE *pipe, void *msg); 
+void read_msg(PIPE *pipe, void *msg);
 void wait_reading(PIPE *pipe);
 void wait_writing(PIPE *pipe);
 void unlock_reading(PIPE *pipe);
