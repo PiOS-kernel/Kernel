@@ -3,7 +3,7 @@
 
 #include "synch.h"
 
-#define NEW_PIPE(lenght, msg_type) init_pipe(lenght, sizeof(msg_type))
+#define NEW_PIPE(lenght, msg_type) new_pipe(lenght, sizeof(msg_type))
 
 //struct defining the pipe as a ciclic message queue 
 typedef struct PIPE {
@@ -19,7 +19,7 @@ typedef struct PIPE {
   char* messages;
 } PIPE;
 
-PIPE *init_pipe(int lenght, uint32_t msg_size);
+PIPE *new_pipe(int lenght, uint32_t msg_size);
 void pub_msg(PIPE *pipe, void *msg); 
 void read_msg(PIPE *pipe, void *msg);
 void wait_reading(PIPE *pipe);
