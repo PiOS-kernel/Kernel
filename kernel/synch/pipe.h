@@ -12,7 +12,7 @@ typedef struct PIPE {
   int current_load;
   MCB *read_mutex;
   MCB *write_mutex;
-  Queue waiting_on_read;
+  TaskTCB *waiting_on_read;
   TaskTCB *waiting_on_write;
   uint32_t msg_size;
   uint32_t pipe_size;

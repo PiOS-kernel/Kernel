@@ -11,7 +11,7 @@ PIPE *init_pipe(int lenght, uint32_t msg_size){
     pipe->current_load = 0;
     pipe->write_mutex = mutex_init();
     pipe->read_mutex = mutex_init();
-    Queue_init(&pipe->waiting_on_read);
+    pipe->waiting_on_read = NULL;
     pipe->waiting_on_write = NULL;
     pipe->msg_size = msg_size;
     pipe->pipe_size = lenght;
@@ -49,21 +49,21 @@ void read_msg(PIPE *pipe, void *msg){
 }
 
 void wait_reading(PIPE *pipe) {
-    pipe->waiting_on_write = RUNNING;               //the task is saved in the pipe as the one waiting to write
-    SHOULD_WAIT = 1;                                //and needs to wait
+    pipe->waiting_on_read = RUNNING;                 //the task is saved in the pipe as the one waiting to write
+    SHOULD_WAIT = 1;                                 //and needs to wait
     yield();                                          
 }
 
 void wait_writing(PIPE *pipe){
-    enqueue(&pipe->waiting_on_write, RUNNING);       //the task is saved in the pipe waiting queue
-    SHOULD_WAIT = 1;                                 //and need to wait
+    pipe->waiting_on_write = RUNNING;                //the task is saved in the pipe as the one waiting to read
+    SHOULD_WAIT = 1;                                 //and needs to wait
     yield();                                    
 }
 
 void unlock_reading(PIPE* pipe){
-    if(!empty(&pipe->waiting_on_read)){     //if there is some task waiting to read
-        TaskTCB *unlocked_task = dequeue(&pipe->waiting_on_read);           //free one task from the queue
-        enqueue(&READY_QUEUES[unlocked_task->priority], unlocked_task);     //and put it back on ready
+    if(pipe->waiting_on_read != NULL){                                      //if there is a task waiting to read
+        enqueue(&READY_QUEUES[pipe->waiting_on_read->priority], &pipe->waiting_on_read);     // put it back on ready
+        pipe->waiting_on_read = NULL;                                       //and free the pointer
     }
 }
 void unlock_writing(PIPE* pipe){
