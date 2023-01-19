@@ -6,6 +6,7 @@
 #include "task/task.h"
 #include "synch/synch.h"
 #include "synch/events.h"
+#include "synch/pipe.h"
 
 void kernel_init();
 void start_scheduler();
