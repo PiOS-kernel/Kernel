@@ -6,7 +6,10 @@
 void TaskTCB_init(TaskTCB* tcb, uint8_t p)
 {
     tcb->priority = p;
+    tcb->default_priority = p;
     tcb->next = NULL;
+    tcb->prev = NULL;
+    tcb->owner = NULL;
     // The stack pointer is initialized to the end address of the task's stack
     tcb->stp = (uint8_t*) (tcb->stack + STACK_SIZE);
 }
@@ -36,6 +39,27 @@ void stack_push(TaskTCB * task, uint8_t* src, int size)
     }
 }
 
+// Function to unlink a task from the linked list it belongs to
+void unlink_task(TaskTCB *task)
+{
+    TaskTCB* prev = task->prev;
+    TaskTCB* next = task->next;
+
+    // update the next and prev pointers of the adjacent tasks
+    if (prev != NULL)
+        prev->next = task->next;
+    if (next != NULL)
+        next->prev = task->prev;
+    task->next = NULL;
+    task->prev = NULL;
+
+    // update the head and tail of the queue
+    if (task == task->owner->head)
+        task->owner->head = next;
+    if (task == task->owner->tail)
+        task->owner->tail = prev;
+}
+
 // initialize the queue with both head and tail NULL
 void Queue_init(Queue* q)
 {
@@ -62,25 +86,19 @@ void enqueue (Queue* q, TaskTCB *task)
     {
         // if it is not empty enqueue the element as the last elemnt
         q->tail->next = task;
-        q->tail = q->tail->next; // update the tail to the new end of the queue
+        task->prev = q->tail;
+        task->next = NULL;
+        q->tail = task; // update the tail to the new end of the queue
     }
+    task->owner = q;
 }
 
-// dequque the first element of the queue
+// dequeue the first element of the queue
 TaskTCB* dequeue (Queue* q){
     if (!empty(q))
     {
         TaskTCB *old_head = q->head;
-        if (old_head->next != NULL)
-        {
-            // shift the head to the following element in the queue 
-            q->head = old_head->next; 
-        }
-        else
-        {
-            q->head = NULL;
-            q->tail = NULL;
-        }
+        unlink_task(old_head);
         return old_head; // return the popped element
     }
     else
@@ -102,14 +120,14 @@ int count_tasks( Queue* q)
     return count;
 }
 
-//return the higer priority task ready to be executed 
+//return the higest priority task ready to be executed 
 TaskTCB* schedule() 
 {
     TaskTCB *selected = NULL;
 
     // get the priority of the running task
     int running_priority = MIN_PRIORITY - 1;
-    if (RUNNING != NULL)
+    if (RUNNING != NULL && !SHOULD_WAIT)
         running_priority = RUNNING->priority;
 
     // look for a task in the ready queues with a priority higher or equal
@@ -126,13 +144,27 @@ TaskTCB* schedule()
 
     // If there was a running task, and the scheduler has selected
     // a new task to be executed, the previously running task is
-    // inserted back in the ready queue
-    if (RUNNING != NULL && selected != NULL) 
+    // inserted back in the ready queue. 
+    // The RUNNING task is not inserted in the ready queue if it wishes 
+    // to enter the WAITING state, or it is the IDLE_TASK, or if no other
+    // READY task of appropriate priority is available.
+    if (RUNNING != NULL && selected != NULL && RUNNING != IDLE_TASK && !SHOULD_WAIT) 
         enqueue(&READY_QUEUES[RUNNING->priority], RUNNING);
-    
+
     if (selected != NULL) {
         RUNNING = selected; // set the selected task as the running task
-        return selected;
+    } else if (RUNNING == NULL || SHOULD_WAIT) {
+        // if there is no running task, and no task is selected, 
+        // the idle task is executed
+        RUNNING = IDLE_TASK;
     }
+ 
+    // Set the SHOULD_WAIT flag to false
+    SHOULD_WAIT = 0;
+    
     return RUNNING;
+}
+
+void idle_task_code(void* _) {
+    while(1);
 }
