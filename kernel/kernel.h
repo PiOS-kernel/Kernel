@@ -4,9 +4,9 @@
 #include "syscalls/syscalls.h"
 #include "heap/malloc.h"
 #include "task/task.h"
-#include "synch/synch.h"
+#include "synch/semaphores.h"
 #include "synch/events.h"
-#include "synch/pipe.h"
+#include "synch/channels.h"
 
 void kernel_init();
 void start_scheduler();

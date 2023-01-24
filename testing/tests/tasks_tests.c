@@ -6,6 +6,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+extern void kcreate_task(void (*code)(void *), void *args, uint8_t priority, TaskHandle* handle);
+
 bool test_queue_empty() {
     Queue q;
     Queue_init(&q);
@@ -90,7 +92,6 @@ bool test_unlink_task() {
     ASSERT(middle->next == q.tail);
     unlink_task(middle->next);
     ASSERT(middle == q.tail);
-    serial_println("here");
     unlink_task(middle);
     ASSERT(empty(&q));
 
