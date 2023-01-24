@@ -5,7 +5,7 @@
 #include "../syscalls/syscalls.h"
 
 //initialize to 0 the channel fileds 
-Channel *new_pipe(int lenght, uint32_t msg_size){
+Channel *new_channel(int lenght, uint32_t msg_size){
     Channel *channel = (Channel*) alloc(sizeof(Channel));
     channel->start = 0;
     channel->end = 0;
