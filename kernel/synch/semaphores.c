@@ -1,4 +1,4 @@
-#include "synch.h"
+#include "semaphores.h"
 #include "../heap/malloc.h"
 #include "../exceptions.h"
 #include "../task/task.h"
