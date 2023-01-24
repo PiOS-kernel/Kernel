@@ -16,7 +16,7 @@ The source code is in the [kernel](kernel) directory, divided into the different
 * The [heap](kernel/heap) directory contains the code that manages dynamic memory allocation.
 * The [task](kernel/task) directory contains the code for the scheduler.
 * In the [syscalls](kernel/syscalls) directory, you'll find the system calls supported by πOS.
-* The [synch](kernel/synch) directory contains the code for tasks syncronization
+* The [synch](kernel/synch) directory contains the code for tasks synchronization.
 * The [utils](kernel/utils) directory contains some utility code.
 * Finally, in the [port](kernel/port) directory you can find source code that is
 specific to the compiler used to build an application that links against πOS. Much of that code is written in assembly.
@@ -55,11 +55,10 @@ And a short presentation video
 
 ## Team members
 
-πOS has been developed by Barbieri Marco, Maglie Francesco and Zaupa Alberto.
-Main contribution:
+πOS has been developed by Barbieri Marco, Maglie Francesco and Zaupa Alberto. Main contribution:
 
-Barbieri Marco - Scheduling functions, syscall,  development 
+Barbieri Marco - Scheduling functions, syscall and synch development 
 
-Maglie Francesco -  
+Maglie Francesco -  Start-up routine, porting, synch development
 
-Zaupa Alberto - General code organization, memory allocation, testing
+Zaupa Alberto - General code organization, memory allocation and syscall development, testing
