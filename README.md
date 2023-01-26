@@ -1,8 +1,8 @@
 # πOS
 
-## Requirements
+## Hardware Requirements
 
-πOS (you should read it as `pì·os`) is an embedded Real Time Operating System for the `Cortex-M4` processor. It fully supports the `msp432` launchpad.
+πOS (you should read it as `pì·os`) is an embedded Operating System developed for the `Cortex-M4` processor. It fully supports the `msp432` launchpad.
 
 ## Getting started
 
@@ -53,12 +53,16 @@ Here you can find a brief [presentiation](https://docs.google.com/presentation/d
 
 And a short presentation video 
 
+##Demo App
+
+A [demo app](https://github.com/PiOS-kernel/demo-app-msp432) for the TI MSP432 board based on πOS is available as an example of a use case of our embedded Operating System
+
 ## Team members
 
 πOS has been developed by Barbieri Marco, Maglie Francesco and Zaupa Alberto. Main contribution:
 
 Barbieri Marco - Scheduling functions, syscall and synch development 
 
-Maglie Francesco -  Start-up routine, porting, synch development
+Maglie Francesco -  Start-up routine, porting, synch development, Demo APP
 
 Zaupa Alberto - General code organization, memory allocation and syscall development, testing
