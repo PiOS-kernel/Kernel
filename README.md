@@ -2,13 +2,13 @@
 
 ## Hardware Requirements
 
-πOS (you should read it as `pì·os`) is an embedded Operating System developed for the `Cortex-M4` processor. It fully supports the `msp432` launchpad.
+πOS (you should read it as `pì·os`) is an embedded Real Time Operating System developed for the `Cortex-M4` processor. It fully supports the `msp432` launchpad.
 
 ## Getting started
 
-To have your application link against πOS, you can either directly compile the source code, or you can choose to compile the kernel as a static library. We reccomend the first option as it is more stable.
-
-To compile πOS as a static library just run `make` in the root directory.
+To have your application link against πOS you should compile the source code in order to import it on your project. 
+Once you've done that you can flash your app on the microcontroller and run it.
+In order to flash your application on a different port you should expand the port module accordingly.
 
 ## Module organization
 
@@ -51,7 +51,7 @@ You can run `./transpiler.py` without arguments to check the arguments format.
 
 Here you can find a brief [presentiation](https://docs.google.com/presentation/d/1UwrHFOR5TECv7jCFEYzsqXVi26k9xcZ9c9n7NmlnuEQ/edit#slide=id.gc6f9e470d_0_0) going through some details of πOS 
 
-And a short presentation video 
+And a short presentation [video](https://drive.google.com/file/d/1wdovbkCU4LN8i_uqJ_YX4u1BSG1Roq7t/view?usp=sharing) 
 
 ##Demo App
 
