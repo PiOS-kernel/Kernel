@@ -52,7 +52,7 @@ Here you can find a brief [presentiation](https://docs.google.com/presentation/d
 
 And a short presentation [video](https://drive.google.com/file/d/1wdovbkCU4LN8i_uqJ_YX4u1BSG1Roq7t/view?usp=sharing) 
 
-##Demo App
+## Demo App
 
 A [demo app](https://github.com/PiOS-kernel/demo-app-msp432) for the TI MSP432 board based on πOS is available as an example of a use case of our embedded Operating System
 
