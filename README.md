@@ -8,7 +8,7 @@
 
 To have your application link against πOS you should compile the source code in order to import it on your project. 
 Once you've done that you can flash your app on the microcontroller and run it.
-Running πOS on a diffeerent platform qould require expanding the port module accordingly.
+Running πOS on a diffeerent platform would require expanding the port module accordingly.
 
 ## Module organization
 
