@@ -8,11 +8,10 @@
 
 To have your application link against πOS you should compile the source code in order to import it on your project. 
 Once you've done that you can flash your app on the microcontroller and run it.
-Running πOS on a diffeerent platform would require expanding the port module accordingly.
 
 ## Module organization
 
-The source code is in the [kernel](kernel) directory, divided into the different modules.
+The source code is in the [kernel](kernel) directory, divided into different modules.
 * The [heap](kernel/heap) directory contains the code that manages dynamic memory allocation.
 * The [task](kernel/task) directory contains the code for the scheduler.
 * In the [syscalls](kernel/syscalls) directory, you'll find the system calls supported by πOS.
